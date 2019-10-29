@@ -1,7 +1,11 @@
-public class Bullet extends Transformable implements GameObject{
+public class Bullet extends Transformable implements GameObject, CollisionManager{
     public static final double BULLET_SPEED = 2.0;
 
     Tank owner;
+
+    public Tank getOwner(){
+        return owner;
+    }
 
     @Override
     public void destroy() {
@@ -28,15 +32,11 @@ public class Bullet extends Transformable implements GameObject{
         rotation.rotate(_rotate);
     }
 
-    public Position getPosition(){
-        return position;
-    }
-
-    public Rotation getRotation(){
-        return rotation;
-    }
-
-    public Tank getOwner(){
-        return owner;
+    @Override
+    public GameObject[] checkCollisions(Map map, Tank[] tanks, Bullet[] bullets) {
+        Block[] blocks = map.getClosestBlocks(this.position);
+        //...
+        //podobnie jak w klasie Tank
+        return null;
     }
 }

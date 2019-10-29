@@ -5,7 +5,13 @@ public class Rotation implements Rotatable{
         rotation = _rotation;
     }
 
-    public Rotation(final Rotation _rotation){ rotation = _rotation.rotation; }
+    public Rotation(final Rotation _rotation){
+        rotation = _rotation.rotation;
+    }
+
+    public double getRotation() {
+        return rotation;
+    }
 
     @Override
     public void rotate(double _rotate){

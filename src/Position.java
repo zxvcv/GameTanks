@@ -12,17 +12,17 @@ public class Position implements Movable{
         y = _position.y;
     }
 
-    @Override
-    public void move(double _x, double _y){
-        x += _x;
-        y += _y;
-    }
-
     public double getX(){
         return x;
     }
 
     public double getY(){
         return y;
+    }
+
+    @Override
+    public void move(double _x, double _y){
+        x += _x;
+        y += _y;
     }
 }
