@@ -1,4 +1,4 @@
-public class Position {
+public class Position implements Movable{
     private double x;
     private double y;
 
@@ -7,16 +7,22 @@ public class Position {
         y = _y;
     }
 
-    public Position(Position _position){
+    public Position(final Position _position){
         x = _position.x;
         y = _position.y;
     }
 
-    public void relativeMovement(double _x, double _y, GameObject _position){
-
+    @Override
+    public void move(double _x, double _y){
+        x += _x;
+        y += _y;
     }
 
-    public void absoluteMovement(double _x, double _y){
+    public double getX(){
+        return x;
+    }
 
+    public double getY(){
+        return y;
     }
 }

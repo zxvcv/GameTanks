@@ -1,3 +1,3 @@
-public interface Movable extends GameObject{
-    void move(double _x, double _y);
+public interface Movable{
+    public void move(double _x, double _y);
 }

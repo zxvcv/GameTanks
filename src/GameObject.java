@@ -1,3 +1,3 @@
-public interface GameObject {
-    Position getPosition();
+
+public interface GameObject extends Drawable, Destroyable {
 }

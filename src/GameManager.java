@@ -1,6 +1,7 @@
-public class GameMenager {
-    CollisionDetector collisionDetector;
-    Player[] players;
+public class GameManager {
+    CollisionManager collisionDetector;
+    DataTransmitter dataTransmitter; //odbiera dane i wysyla
+    Tank[] tanks;
     Map map;
     Bullet[] bullets;
 
@@ -10,14 +11,14 @@ public class GameMenager {
 
         map.update();
 
-        for(Player p : players)
+        for(Tank p : tanks)
             p.update();
     }
 
     public void display(){
         map.display();
 
-        for(Player p : players)
+        for(Tank p : tanks)
             p.display();
 
         for(Bullet b : bullets)

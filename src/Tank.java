@@ -1,7 +1,6 @@
-public class Bullet extends Transformable implements GameObject{
-    public static final double BULLET_SPEED = 2.0;
-
-    Tank owner;
+public class Tank extends Transformable implements GameObject, Shootable{
+    public static final double TANK_SPEED = 1.0;
+    private double hp;
 
     @Override
     public void destroy() {
@@ -28,6 +27,11 @@ public class Bullet extends Transformable implements GameObject{
         rotation.rotate(_rotate);
     }
 
+    @Override
+    public Bullet shoot(Rotation rot, Position pos) {
+        return null;
+    }
+
     public Position getPosition(){
         return position;
     }
@@ -36,7 +40,13 @@ public class Bullet extends Transformable implements GameObject{
         return rotation;
     }
 
-    public Tank getOwner(){
-        return owner;
+    public double getHp(){
+        return hp;
+    }
+
+    public void hit(double _dmg){
+        hp -= _dmg;
+        if(hp <= 0)
+            this.destroy();
     }
 }

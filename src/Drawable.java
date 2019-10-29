@@ -1,3 +1,4 @@
-public interface Drawable extends GameObject{
+public interface Drawable{
     void display();
+    void update();
 }
