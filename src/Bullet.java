@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class Bullet extends Transformable implements GameObject, CollisionManager{
     public static final double BULLET_SPEED = 2.0;
     private Tank owner;
@@ -23,25 +25,42 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     }
 
     @Override
-    public void update() {
-
+    public void update(GameManager gameManager) {
+        if(rotation.getRotation() == 0)
+            move(GameTime.deltaTime() * BULLET_SPEED, 0);
+        if(rotation.getRotation() == 90)
+            move(0, GameTime.deltaTime() * BULLET_SPEED);
+        if(rotation.getRotation() == 180)
+            move(GameTime.deltaTime() * BULLET_SPEED * (-1), 0);
+        if(rotation.getRotation() == 270)
+            move(0, GameTime.deltaTime() * BULLET_SPEED * (-1));
     }
 
     @Override
-    public void move(double _x, double _y) {
-        position.move(_x, _y);
+    public void unupdate(GameManager gameManager) {
+        if(rotation.getRotation() == 0)
+            move(GameTime.deltaTime() * BULLET_SPEED * (-1), 0);
+        if(rotation.getRotation() == 90)
+            move(0, GameTime.deltaTime() * BULLET_SPEED * (-1));
+        if(rotation.getRotation() == 180)
+            move(GameTime.deltaTime() * BULLET_SPEED, 0);
+        if(rotation.getRotation() == 270)
+            move(0, GameTime.deltaTime() * BULLET_SPEED);
     }
 
     @Override
-    public void rotate(double _rotate) {
-        rotation.rotate(_rotate);
-    }
-
-    @Override
-    public GameObject[] checkCollisions(Map map, Tank[] tanks, Bullet[] bullets) {
+    public LinkedList<GameObject> checkCollisions(Map map, LinkedList<Tank> tanks, LinkedList<Bullet> bullets) {
         Block[] blocks = map.getClosestBlocks(this.position);
-        //...
-        //podobnie jak w klasie Tank
+        LinkedList<GameObject> collisions = new LinkedList<>();
+
+        for(Block b : blocks){
+            if(this.distanceToObj(b) <= 0)
+                collisions.add(b);
+        }
+        for(Tank t : tanks){
+            if(this.distanceToObj(t) <= 0)
+                collisions.add(t);
+        }
         return null;
     }
 

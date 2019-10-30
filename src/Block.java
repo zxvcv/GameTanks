@@ -3,4 +3,8 @@ public abstract class Block extends Shiftable implements GameObject{
 
     protected Position position;
 
+    @Override
+    public void update(GameManager gameManager) {
+        //nothing
+    }
 }

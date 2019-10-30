@@ -7,6 +7,11 @@ public abstract class Shiftable implements Movable{
         return position;
     }
 
+    @Override
+    public void move(double _x, double _y) {
+        this.getPosition().move(_x, _y);
+    }
+
     public double distanceToObj(Shiftable p2){
         Position posP1 = this.getPosition();
         Position posP2 = p2.getPosition();

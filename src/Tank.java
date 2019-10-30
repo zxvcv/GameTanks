@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class Tank extends Transformable implements GameObject, Shootable, CollisionManager{
     public static final double TANK_SPEED = 1.0;
     private double hp;
@@ -12,6 +14,12 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
             this.destroy();
     }
 
+    public Tank(Tank tank){
+        this.hp = tank.hp;
+        this.position = tank.position;
+        this.rotation = tank.rotation;
+    }
+
     @Override
     public void destroy() {
 
@@ -23,18 +31,13 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     }
 
     @Override
-    public void update() {
-
+    public void update(GameManager gameManager) {
+        //update zalezny od danych odebranych
     }
 
     @Override
-    public void move(double _x, double _y) {
-        this.getPosition().move(_x, _y);
-    }
-
-    @Override
-    public void rotate(double _rotate) {
-        this.getRotation().rotate(_rotate);
+    public void unupdate(GameManager gameManager) {
+        //unupdate zalezy od update i danych odebranych
     }
 
     @Override
@@ -43,22 +46,22 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     }
 
     @Override
-    public GameObject[] checkCollisions(Map map, Tank[] tanks, Bullet[] bullets) {
-        //!!!!trzeba sprawdzac kolizje na nowych danych ale starych nie usuwac w razie gdyby pojawila sie kolizja
-
+    public LinkedList<GameObject> checkCollisions(Map map, LinkedList<Tank> tanks, LinkedList<Bullet> bullets) {
         Block[] blocks = map.getClosestBlocks(this.position);
+        LinkedList<GameObject> collisions = new LinkedList<>();
+
         for(Bullet b : bullets){
-            //sprawdzenie kolizji z pociskami
-            // (jezeli zniszczony to nie trzeba sprawdzac kolizji dalej)
+            if(this.distanceToObj(b) <= 0)
+                collisions.add(b);
         }
         for(Block b : blocks){
-            //sprawdzenie kolizji z blokami
+            if(this.distanceToObj(b) <= 0)
+                collisions.add(b);
         }
         for(Tank t : tanks){
-            //sprawdzanie kolizji z innymi czolgami
+            if(this.distanceToObj(t) <= 0)
+                collisions.add(t);
         }
         return null;
     }
-
-
 }

@@ -1,3 +1,3 @@
 public interface Rotatable{
-    void rotate(double _rotate);
+    void rotate(int _rotate);
 }

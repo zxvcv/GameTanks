@@ -16,8 +16,8 @@ public class Map implements Drawable {
     }
 
     @Override
-    public void update(){
-
+    public void update(GameManager gameManager){
+        //nothing
     }
 
     @Override

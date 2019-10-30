@@ -1,4 +1,5 @@
+import java.util.LinkedList;
 
 public interface CollisionManager {
-    public GameObject[] checkCollisions(Map map, Tank[] tanks, Bullet[] bullets);
+    public LinkedList<GameObject> checkCollisions(Map map, LinkedList<Tank> tanks, LinkedList<Bullet> bullets);
 }

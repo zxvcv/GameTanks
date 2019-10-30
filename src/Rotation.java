@@ -1,7 +1,7 @@
 public class Rotation implements Rotatable{
-    double rotation;
+    int rotation;
 
-    public Rotation(double _rotation){
+    public Rotation(int _rotation){
         rotation = _rotation;
     }
 
@@ -9,12 +9,12 @@ public class Rotation implements Rotatable{
         rotation = _rotation.rotation;
     }
 
-    public double getRotation() {
+    public int getRotation() {
         return rotation;
     }
 
     @Override
-    public void rotate(double _rotate){
+    public void rotate(int _rotate){
         rotation += _rotate;
         if(rotation >= 360 || rotation < 0)
             rotation %= 360;

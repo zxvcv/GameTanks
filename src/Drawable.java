@@ -1,4 +1,7 @@
-public interface Drawable{
+import java.util.LinkedList;
+
+public interface Drawable<T extends GameObject>{
     void display();
-    void update();
+    void update(GameManager gameManager);
+    void unupdate(GameManager gameManager);
 }
