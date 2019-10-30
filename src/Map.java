@@ -1,3 +1,5 @@
+import java.util.LinkedList;
+
 public class Map implements Drawable {
     public static final int MAP_SIZE_X = 25;
     public static final int MAP_SIZE_Y = 25;
@@ -8,7 +10,11 @@ public class Map implements Drawable {
     }
 
     Block[] getClosestBlocks(Position position){
-        return null;
+        LinkedList<Block> blocks = new LinkedList<>();
+
+        //...
+
+        return (Block[])blocks.toArray();
     }
 
     public Map() {
