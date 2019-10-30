@@ -16,7 +16,7 @@ public class Rotation implements Rotatable{
     @Override
     public void rotate(double _rotate){
         rotation += _rotate;
-        if(rotation>=360 || rotation < 0)
+        if(rotation >= 360 || rotation < 0)
             rotation %= 360;
     }
 }

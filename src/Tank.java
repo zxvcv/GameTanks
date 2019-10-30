@@ -29,17 +29,17 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void move(double _x, double _y) {
-        position.move(_x, _y);
+        this.getPosition().move(_x, _y);
     }
 
     @Override
     public void rotate(double _rotate) {
-        rotation.rotate(_rotate);
+        this.getRotation().rotate(_rotate);
     }
 
     @Override
-    public Bullet shoot(Rotation rot, Position pos) {
-        return null;
+    public Bullet shoot() {
+        return new Bullet(this.position, this.rotation, this);
     }
 
     @Override
@@ -59,4 +59,6 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
         }
         return null;
     }
+
+
 }

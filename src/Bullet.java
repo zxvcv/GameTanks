@@ -1,7 +1,12 @@
 public class Bullet extends Transformable implements GameObject, CollisionManager{
     public static final double BULLET_SPEED = 2.0;
+    private Tank owner;
 
-    Tank owner;
+    public Bullet(Position position, Rotation rotation, Tank owner){
+        this.position = position;
+        this.rotation = rotation;
+        this.owner = owner;
+    }
 
     public Tank getOwner(){
         return owner;
@@ -38,5 +43,10 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
         //...
         //podobnie jak w klasie Tank
         return null;
+    }
+
+    @Override
+    public double distanceToBound(Shiftable p2){
+        return 0;
     }
 }

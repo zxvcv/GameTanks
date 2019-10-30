@@ -1,10 +1,7 @@
-public abstract class Transformable implements Movable, Rotatable{
-    protected Position position;
-    protected Rotation rotation;
+import static java.lang.Math.*;
 
-    public Position getPosition(){
-        return position;
-    }
+public abstract class Transformable extends Shiftable implements Rotatable{
+    protected Rotation rotation;
 
     public Rotation getRotation(){
         return rotation;
