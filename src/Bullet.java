@@ -1,10 +1,11 @@
 import java.util.LinkedList;
 
 public class Bullet extends Transformable implements GameObject, CollisionManager{
-    public static final double BULLET_SPEED = 2.0;
+    static final double BULLET_SPEED = 2.0;
+    static final double BULLET_DMG = 10;
     private Tank owner;
 
-    public Bullet(Position position, Rotation rotation, Tank owner){
+    Bullet(Position position, Rotation rotation, Tank owner){
         this.position = position;
         this.rotation = rotation;
         this.owner = owner;
@@ -16,7 +17,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void destroy() {
-
+        GameManager.bullets.remove(this);
     }
 
     @Override
@@ -25,7 +26,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     }
 
     @Override
-    public void update(GameManager gameManager) {
+    public void firstUpdate() {
         if(rotation.getRotation() == 0)
             move(GameTime.deltaTime() * BULLET_SPEED, 0);
         if(rotation.getRotation() == 90)
@@ -37,15 +38,26 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     }
 
     @Override
-    public void unupdate(GameManager gameManager) {
-        if(rotation.getRotation() == 0)
-            move(GameTime.deltaTime() * BULLET_SPEED * (-1), 0);
-        if(rotation.getRotation() == 90)
-            move(0, GameTime.deltaTime() * BULLET_SPEED * (-1));
-        if(rotation.getRotation() == 180)
-            move(GameTime.deltaTime() * BULLET_SPEED, 0);
-        if(rotation.getRotation() == 270)
-            move(0, GameTime.deltaTime() * BULLET_SPEED);
+    public void update() {
+        LinkedList<GameObject> collisions = checkCollisions(GameManager.map, GameManager.tanks, GameManager.bullets);
+        if(collisions.isEmpty())
+            return;
+        for(GameObject o : collisions){
+            if(o instanceof Tank){
+                owner.getPlayer().addPoints(20);
+                ((Tank) o).hit(BULLET_DMG);
+            }
+            if(o instanceof Block) {
+                owner.getPlayer().addPoints(1);
+                ((Block) o).hit(BULLET_DMG);
+            }
+        }
+        this.destroy();
+    }
+
+    @Override
+    public void lateUpdate() {
+        //not used
     }
 
     @Override

@@ -1,14 +1,24 @@
 import java.util.LinkedList;
 
 public class Tank extends Transformable implements GameObject, Shootable, CollisionManager{
-    public static final double TANK_SPEED = 1.0;
+    static final double TANK_SPEED = 1.0;
+    static final double TANK_BASIC_HP = 100;
     private double hp;
+    private Player player;
+
+    public Tank(){
+        hp = TANK_BASIC_HP;
+    }
 
     public double getHp(){
         return hp;
     }
 
-    public void hit(double _dmg){
+    Player getPlayer(){
+        return player;
+    }
+
+    void hit(double _dmg){
         hp -= _dmg;
         if(hp <= 0)
             this.destroy();
@@ -18,11 +28,13 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
         this.hp = tank.hp;
         this.position = tank.position;
         this.rotation = tank.rotation;
+        this.player = tank.player;
     }
 
     @Override
     public void destroy() {
-
+        player.remTank();
+        GameManager.tanks.remove(this);
     }
 
     @Override
@@ -31,13 +43,26 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     }
 
     @Override
-    public void update(GameManager gameManager) {
-        //update zalezny od danych odebranych
+    public void firstUpdate() {
+        //first update made in firstUpdate of Player class just after new data comes
     }
 
     @Override
-    public void unupdate(GameManager gameManager) {
-        //unupdate zalezy od update i danych odebranych
+    public void update() {
+        LinkedList<GameObject> collisions = checkCollisions(GameManager.map, GameManager.tanks, GameManager.bullets);
+        if(collisions.isEmpty())
+            return;
+        for(GameObject o : collisions){
+            if(o instanceof Bullet)
+                continue;
+            if(o instanceof Block)
+                player.lateUpdate();
+        }
+    }
+
+    @Override
+    public void lateUpdate() {
+        //not used
     }
 
     @Override

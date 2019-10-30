@@ -1,39 +1,28 @@
 import java.util.LinkedList;
 
 public class GameManager {
-    CollisionManager collisionDetector;
-    DataTransmitter dataTransmitter; //odbiera dane i wysyla
-    LinkedList<Tank> tanks;
-    Map map;
-    LinkedList<Bullet> bullets;
-    LinkedList<Player> players;
+    public static CollisionManager collisionDetector;
+    static LinkedList<Tank> tanks;
+    static Map map;
+    static LinkedList<Bullet> bullets;
+    static LinkedList<Player> players;
 
     public void update(){
-        //update changes
-        for(Bullet b : bullets)
-            b.update(this);
+        //firstUpdate
+        for(Bullet b: bullets)
+            b.firstUpdate();
+        //tanks firstUpdate just after data comes
 
-        map.update(this);
 
-        for(Tank p : tanks)
-            p.update(this);
+        //update
+        for(Bullet b: bullets)
+            b.update();
+        for(Tank t : tanks)
+            t.update();
 
-        //calculate
-        LinkedList<GameObject> collisions;
-        for(Bullet b : bullets) {
-            collisions = b.checkCollisions(map, tanks, bullets);
-            if(collisions.isEmpty())
-                break;
-            else
-                //collisionsResolve(collisions);
-        }
-        for(Tank t : tanks){
-            collisions = t.checkCollisions(map, tanks, bullets);
-            if(collisions.isEmpty())
-                break;
-            else
-                //collisionsResolve(collisions);
-        }
+
+        //lateUpdate
+        //nothing
     }
 
     public void display(){
@@ -47,6 +36,6 @@ public class GameManager {
     }
 
     public void send(){
-
+        //send data to players
     }
 }

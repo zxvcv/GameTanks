@@ -1,7 +1,7 @@
 public abstract class Transformable extends Shiftable implements Rotatable{
     protected Rotation rotation;
 
-    public Rotation getRotation(){
+    Rotation getRotation(){
         return rotation;
     }
 

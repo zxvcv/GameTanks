@@ -1,10 +1,15 @@
 public abstract class Block extends Shiftable implements GameObject{
-    public static final int BLOCK_SIZE = 40;
+    static final int BLOCK_SIZE = 40;
+    private double hp;
 
-    protected Position position;
+    void hit(double _dmg){
+        hp -= _dmg;
+        if(hp <= 0)
+            this.destroy();
+    }
 
     @Override
-    public void update(GameManager gameManager) {
+    public void update() {
         //nothing
     }
 }
