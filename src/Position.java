@@ -20,8 +20,13 @@ public class Position implements Movable{
         return y;
     }
 
+    public synchronized void setPosition(double x, double y){
+        this.x=x;
+        this.y=y;
+    }
+
     @Override
-    public void move(double _x, double _y){
+    public synchronized void move(double _x, double _y){
         x += _x;
         y += _y;
     }

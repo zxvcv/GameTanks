@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Bullet extends Transformable implements GameObject, CollisionManager{
     static final double BULLET_SPEED = 2.0;
@@ -17,16 +18,16 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void destroy() {
-        GameManager.bullets.remove(this);
+        Game.getGameManager().getBullets().remove(this);
     }
 
     @Override
     public void display() {
-
+        //...
     }
 
     @Override
-    public void firstUpdate() {
+    public void dataUpdate() {
         if(rotation.getRotation() == 0)
             move(GameTime.deltaTime() * BULLET_SPEED, 0);
         if(rotation.getRotation() == 90)
@@ -38,32 +39,29 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     }
 
     @Override
-    public void update() {
-        LinkedList<GameObject> collisions = checkCollisions(GameManager.map, GameManager.tanks, GameManager.bullets);
+    public void collisionUpdate() {
+        GameManager gm = Game.getGameManager();
+        LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
         if(collisions.isEmpty())
             return;
-        for(GameObject o : collisions){
+        for(Drawable o : collisions){
             if(o instanceof Tank){
                 owner.getPlayer().addPoints(20);
                 ((Tank) o).hit(BULLET_DMG);
-            }
-            if(o instanceof Block) {
-                owner.getPlayer().addPoints(1);
-                ((Block) o).hit(BULLET_DMG);
             }
         }
         this.destroy();
     }
 
     @Override
-    public void lateUpdate() {
-        //not used
+    public void afterUpdate() {
+        //---
     }
 
     @Override
-    public LinkedList<GameObject> checkCollisions(Map map, LinkedList<Tank> tanks, LinkedList<Bullet> bullets) {
+    public LinkedList<Drawable> checkCollisions(Map map, ConcurrentLinkedQueue<Tank> tanks, ConcurrentLinkedQueue<Bullet> bullets) {
         Block[] blocks = map.getClosestBlocks(this.position);
-        LinkedList<GameObject> collisions = new LinkedList<>();
+        LinkedList<Drawable> collisions = new LinkedList<>();
 
         for(Block b : blocks){
             if(this.distanceToObj(b) <= 0)
@@ -73,7 +71,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
             if(this.distanceToObj(t) <= 0)
                 collisions.add(t);
         }
-        return null;
+        return collisions;
     }
 
     @Override

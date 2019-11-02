@@ -1,3 +1,3 @@
 public interface Shootable {
-    Bullet shoot();
+    void shoot();
 }

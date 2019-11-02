@@ -25,7 +25,7 @@ public abstract class Shiftable implements Movable{
     }
 
     @Override
-    public void move(double _x, double _y) {
+    public synchronized void move(double _x, double _y) {
         this.getPosition().move(_x, _y);
     }
 }

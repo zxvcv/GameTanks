@@ -1,9 +1,13 @@
 import java.util.LinkedList;
 
-public class Map implements Drawable {
-    public static final int MAP_SIZE_X = 25;
-    public static final int MAP_SIZE_Y = 25;
+public class Map implements Drawable{
+    public static final int MAP_SIZE = 25; //always square
     private Block[][] mapBlocks;
+
+    public Map() {
+        mapBlocks = new Block[MAP_SIZE][MAP_SIZE];
+        //always the same map
+    }
 
     public Block getBlock(int x, int y){
         return mapBlocks[x][y];
@@ -17,27 +21,8 @@ public class Map implements Drawable {
         return (Block[])blocks.toArray();
     }
 
-    public Map() {
-
-    }
-
-    @Override
-    public void update(){
-
-    }
-
-    @Override
-    public void lateUpdate() {
-
-    }
-
     @Override
     public void display(){
-
-    }
-
-    @Override
-    public void firstUpdate() {
 
     }
 }

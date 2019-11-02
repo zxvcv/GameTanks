@@ -1,41 +1,121 @@
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CyclicBarrier;
 
-public class GameManager {
-    public static CollisionManager collisionDetector;
-    static LinkedList<Tank> tanks;
-    static Map map;
-    static LinkedList<Bullet> bullets;
-    static LinkedList<Player> players;
+public class GameManager implements Updateable, Drawable{
+    private volatile boolean dataReady;
+    private volatile boolean collisionReady;
+    private volatile boolean afterReady;
+    private ConcurrentLinkedQueue<GameObject> dataQueue;
+    private ConcurrentLinkedQueue<GameObject> collisionQueue;
+    private ConcurrentLinkedQueue<GameObject> afterQueue;
+    private CyclicBarrier barrier;
 
-    public void update(){
-        //firstUpdate
-        for(Bullet b: bullets)
-            b.firstUpdate();
-        //tanks firstUpdate just after data comes
+    private ConcurrentLinkedQueue<Tank> tanks;
+    private Map map;
+    private ConcurrentLinkedQueue<Bullet> bullets;
+    private ConcurrentLinkedQueue<Player> players;
 
+    public GameManager(boolean isThisServer){
+        if(isThisServer){
+            dataQueue = new ConcurrentLinkedQueue<>();
+            collisionQueue = new ConcurrentLinkedQueue<>();
+            afterQueue = new ConcurrentLinkedQueue<>();
+            barrier = new CyclicBarrier(Game.SERVER_THREADS);
 
-        //update
-        for(Bullet b: bullets)
-            b.update();
-        for(Tank t : tanks)
-            t.update();
+            dataReady = false;
+            collisionReady = false;
+            afterReady = false;
+        }
+        else{
+            //inicjalizacja dla wersji Klienta
+        }
 
-
-        //lateUpdate
-        //nothing
+        tanks = new ConcurrentLinkedQueue<>();
+        map = new Map();
+        bullets = new ConcurrentLinkedQueue<>();
+        players = new ConcurrentLinkedQueue<>();
     }
 
+    public ConcurrentLinkedQueue<Tank> getTanks(){
+        return tanks;
+    }
+
+    public Map getMap(){
+        return map;
+    }
+
+    public ConcurrentLinkedQueue<Bullet> getBullets(){
+        return bullets;
+    }
+
+    public ConcurrentLinkedQueue<Player> getPlayers(){
+        return players;
+    }
+
+    public boolean isDataQueueFilled() {
+        return dataReady;
+    }
+
+    public boolean isCollisionQueueFilled() {
+        return collisionReady;
+    }
+
+    public boolean isAfterQueueFilled() {
+        return afterReady;
+    }
+
+    public ConcurrentLinkedQueue<GameObject> getDataQueue() {
+        return dataQueue;
+    }
+
+    public ConcurrentLinkedQueue<GameObject> getCollisionQueue() {
+        return collisionQueue;
+    }
+
+    public ConcurrentLinkedQueue<GameObject> getAfterQueue() {
+        return afterQueue;
+    }
+
+    public CyclicBarrier getBarrier() {
+        return barrier;
+    }
+
+    private void clearReadyFlags(){
+        dataReady = false;
+        collisionReady = false;
+        afterReady = false;
+    }
+
+    public void prepareCycle(){
+        clearReadyFlags();
+        this.notifyAll();
+    }
+
+    public void closeCycle(){
+
+    }
+
+    @Override
+    public void dataUpdate() {
+        dataQueue.addAll(tanks);
+        dataQueue.addAll(bullets);
+    }
+
+    @Override
+    public void collisionUpdate() {
+        collisionQueue.addAll(tanks);
+        collisionQueue.addAll(bullets);
+    }
+
+    @Override
+    public void afterUpdate() {
+        collisionQueue.addAll(tanks);
+        collisionQueue.addAll(bullets);
+    }
+
+    @Override
     public void display(){
-        map.display();
 
-        for(Tank p : tanks)
-            p.display();
-
-        for(Bullet b : bullets)
-            b.display();
-    }
-
-    public void send(){
-        //send data to players
     }
 }

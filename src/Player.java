@@ -3,11 +3,11 @@ public class Player implements GameObject{
     private Tank tank;
     private int points;
 
-    void addPoints(int pt){
+    public synchronized void addPoints(int pt){
         points += pt;
     }
 
-    public void subPoints(int pt){
+    public synchronized void subPoints(int pt){
         points -= pt;
     }
 
@@ -15,34 +15,33 @@ public class Player implements GameObject{
         return points;
     }
 
-    void remTank(){
+    public synchronized void remTank(){
         tank = null;
     }
 
     @Override
     public void display() {
-        //unused in Player
+        //...
     }
 
     @Override
-    public void firstUpdate() {
-        //update swojego czolgu po otrzymaniu danych o dzialaniach gracza
-        //wywolanie metody shoot na tanku jezeli zostal wykonany strzal
+    public void dataUpdate() {
+        //...
     }
 
     @Override
-    public void update(){
-        //not used
+    public void collisionUpdate() {
+        //...
     }
 
     @Override
-    public void lateUpdate() {
-        //cofniecie zmian jezeli kolizja nie z pociskiem
+    public void afterUpdate() {
+        //...
     }
 
     @Override
     public void destroy() {
         tank.destroy();
-        GameManager.players.remove(this);
+        Game.getGameManager().getPlayers().remove(this);
     }
 }

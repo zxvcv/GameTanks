@@ -1,3 +1,3 @@
 
-public interface GameObject extends Drawable, Destroyable {
+public interface GameObject extends Updateable, Drawable, Destroyable {
 }
