@@ -1,6 +1,6 @@
 import java.util.concurrent.*;
 
-public abstract class Game {
+public class Game {
     static final int SERVER_THREADS = 4;
 
     private static GameManager gameManager;
@@ -24,13 +24,13 @@ public abstract class Game {
                 }
 
                 try {
-                    gameManager.getBarrier().await();
+                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (BrokenBarrierException e) {
                     e.printStackTrace();
                 }finally {
-                    gameManager.getBarrier().reset();
+                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
                 }
 
                 while(true){
@@ -41,13 +41,13 @@ public abstract class Game {
                 }
 
                 try {
-                    gameManager.getBarrier().await();
+                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (BrokenBarrierException e) {
                     e.printStackTrace();
                 }finally {
-                    gameManager.getBarrier().reset();
+                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
                 }
 
                 while(true){
@@ -58,13 +58,13 @@ public abstract class Game {
                 }
 
                 try {
-                    gameManager.getBarrier().await();
+                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (BrokenBarrierException e) {
                     e.printStackTrace();
                 }finally {
-                    gameManager.getBarrier().reset();
+                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
                 }
             }
         }
@@ -96,14 +96,27 @@ public abstract class Game {
         for(int i=0; i<SERVER_THREADS; ++i)
             executorService.execute(new ServerTask());
 
-        while(true){
+        //while(true){
             //bariera czasowa i transmitera danych
+            /*try {
+                //??
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await(100, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (BrokenBarrierException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+
+            } finally {
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).reset();
+            }*/
+
             gameManager.prepareCycle();
             gameManager.dataUpdate();
             gameManager.collisionUpdate();
             gameManager.afterUpdate();
             gameManager.closeCycle();
-        }
+        //}
     }
 
     private void runClientMode(){
@@ -116,8 +129,10 @@ public abstract class Game {
     }
 
     public static void main(String[] args){
-
+        Game game = new Game();
         //wybór trybu aplikacji (client/server)
+
         //uruchomienie odpowiedzniego trybu
+        game.runServerMode();
     }
 }

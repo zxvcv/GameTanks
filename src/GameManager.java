@@ -9,7 +9,12 @@ public class GameManager implements Updateable, Drawable{
     private ConcurrentLinkedQueue<GameObject> dataQueue;
     private ConcurrentLinkedQueue<GameObject> collisionQueue;
     private ConcurrentLinkedQueue<GameObject> afterQueue;
-    private CyclicBarrier barrier;
+    private CyclicBarrier barrierTaskRuntime;
+    private CyclicBarrier barrierTransmitters; //ilosc zalezy od ilosci graczy
+    public enum BarrierNum{
+        TASK_BARRIER,
+        TRANSMITTER_BARRIER
+    }
 
     private ConcurrentLinkedQueue<Tank> tanks;
     private Map map;
@@ -21,7 +26,7 @@ public class GameManager implements Updateable, Drawable{
             dataQueue = new ConcurrentLinkedQueue<>();
             collisionQueue = new ConcurrentLinkedQueue<>();
             afterQueue = new ConcurrentLinkedQueue<>();
-            barrier = new CyclicBarrier(Game.SERVER_THREADS);
+            barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS);
 
             dataReady = false;
             collisionReady = false;
@@ -77,8 +82,11 @@ public class GameManager implements Updateable, Drawable{
         return afterQueue;
     }
 
-    public CyclicBarrier getBarrier() {
-        return barrier;
+    public CyclicBarrier getBarrier(BarrierNum barrierNum) {
+        if(barrierNum == BarrierNum.TASK_BARRIER)
+            return barrierTaskRuntime;
+        else
+            return barrierTransmitters;
     }
 
     private void clearReadyFlags(){
@@ -100,18 +108,21 @@ public class GameManager implements Updateable, Drawable{
     public void dataUpdate() {
         dataQueue.addAll(tanks);
         dataQueue.addAll(bullets);
+        dataReady = true;
     }
 
     @Override
     public void collisionUpdate() {
         collisionQueue.addAll(tanks);
         collisionQueue.addAll(bullets);
+        collisionReady = true;
     }
 
     @Override
     public void afterUpdate() {
-        collisionQueue.addAll(tanks);
-        collisionQueue.addAll(bullets);
+        afterQueue.addAll(tanks);
+        afterQueue.addAll(bullets);
+        afterReady = true;
     }
 
     @Override
