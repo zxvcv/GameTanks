@@ -1,8 +1,12 @@
 import java.util.LinkedList;
+import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
 public class GameManager implements Updateable, Drawable{
+    public static int countBull = 0; //test
+    public static int countTank = 0; //test
+
     private volatile boolean dataReady;
     private volatile boolean collisionReady;
     private volatile boolean afterReady;
@@ -10,10 +14,12 @@ public class GameManager implements Updateable, Drawable{
     private ConcurrentLinkedQueue<GameObject> collisionQueue;
     private ConcurrentLinkedQueue<GameObject> afterQueue;
     private CyclicBarrier barrierTaskRuntime;
+    private CyclicBarrier barrierPeroidRuntime;
     private CyclicBarrier barrierTransmitters; //ilosc zalezy od ilosci graczy
     public enum BarrierNum{
         TASK_BARRIER,
-        TRANSMITTER_BARRIER
+        TRANSMITTER_BARRIER,
+        PEROID_BARRIER
     }
 
     private ConcurrentLinkedQueue<Tank> tanks;
@@ -27,6 +33,7 @@ public class GameManager implements Updateable, Drawable{
             collisionQueue = new ConcurrentLinkedQueue<>();
             afterQueue = new ConcurrentLinkedQueue<>();
             barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS);
+            barrierPeroidRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
 
             dataReady = false;
             collisionReady = false;
@@ -85,8 +92,10 @@ public class GameManager implements Updateable, Drawable{
     public CyclicBarrier getBarrier(BarrierNum barrierNum) {
         if(barrierNum == BarrierNum.TASK_BARRIER)
             return barrierTaskRuntime;
-        else
+        else if(barrierNum == BarrierNum.TRANSMITTER_BARRIER)
             return barrierTransmitters;
+        else
+            return barrierPeroidRuntime;
     }
 
     private void clearReadyFlags(){
@@ -96,8 +105,33 @@ public class GameManager implements Updateable, Drawable{
     }
 
     public void prepareCycle(){
+        //----do testu
+        Tank t1 = new Tank(new Position(1f, 1f), new Rotation(1), new Player());
+        tanks.add(t1);
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
+        Tank t2 = new Tank(new Position(1f, 1f), new Rotation(1), new Player());
+        tanks.add(t2);
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
+        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
+        //----koniec do testu
+
         clearReadyFlags();
-        this.notifyAll();
+        try {
+            barrierPeroidRuntime.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }finally {
+            barrierPeroidRuntime.reset();
+        }
     }
 
     public void closeCycle(){

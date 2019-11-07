@@ -9,18 +9,25 @@ public class Game {
     class ServerTask implements Runnable {
         @Override
         public void run() {
-            while(true){
-                try{
-                    gameManager.wait();
+            //while(true){
+                GameObject go;
+                try {
+                    gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (BrokenBarrierException e) {
+                    e.printStackTrace();
+                }finally {
+
                 }
 
                 while(true){
                     if(gameManager.isDataQueueFilled() && gameManager.getDataQueue().isEmpty())
                        break;
                     else
-                        gameManager.getDataQueue().poll().dataUpdate();
+                        go = gameManager.getDataQueue().poll();
+                    if(go != null)
+                        go.dataUpdate();
                 }
 
                 try {
@@ -37,7 +44,9 @@ public class Game {
                     if(gameManager.isCollisionQueueFilled() && gameManager.getCollisionQueue().isEmpty())
                         break;
                     else
-                        gameManager.getCollisionQueue().poll().dataUpdate();
+                        go = gameManager.getCollisionQueue().poll();
+                        if(go != null)
+                            go.collisionUpdate();
                 }
 
                 try {
@@ -54,7 +63,9 @@ public class Game {
                     if(gameManager.isAfterQueueFilled() && gameManager.getAfterQueue().isEmpty())
                         break;
                     else
-                        gameManager.getAfterQueue().poll().dataUpdate();
+                        go = gameManager.getAfterQueue().poll();
+                    if(go != null)
+                        go.afterUpdate();
                 }
 
                 try {
@@ -66,7 +77,7 @@ public class Game {
                 }finally {
                     gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
                 }
-            }
+            //}
         }
     }
 

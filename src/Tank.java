@@ -7,6 +7,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     private double hp;
     private Player player;
     private Position previousPosition;
+    private int num; //test
 
     public Tank(Tank tank){
         this.hp = tank.hp;
@@ -14,6 +15,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
         this.rotation = tank.rotation;
         this.player = tank.player;
         this.previousPosition = tank.previousPosition;
+        num = GameManager.countTank++; //test
     }
 
     public Tank(Position position, Rotation rotation, Player player){
@@ -22,6 +24,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
         this.rotation = rotation;
         this.player = player;
         this.previousPosition = new Position(position);
+        num = GameManager.countTank++; //test
     }
 
     public double getHp(){
@@ -51,11 +54,14 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void dataUpdate() {
+        System.out.println("dataUpdate - Tank" + num);
         //zmiana watosci po otrzymaniu danych od gracza
     }
 
     @Override
     public void collisionUpdate() {
+        System.out.println("collisionUpdate - Tank" + num);
+        /*
         GameManager gm = Game.getGameManager();
         LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
         if(collisions.isEmpty())
@@ -64,10 +70,12 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
             if(o instanceof Block || o instanceof Tank)
                 position.setPosition(previousPosition.getX(), previousPosition.getY()); //cofniecie ruchu (nie mozna sie ruszyc w te strone)
         }
+         */
     }
 
     @Override
     public void afterUpdate() {
+        System.out.println("afterUpdate - Tank" + num);
         //---
     }
 
