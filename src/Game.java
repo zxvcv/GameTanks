@@ -96,7 +96,7 @@ public class Game {
         for(int i=0; i<SERVER_THREADS; ++i)
             executorService.execute(new ServerTask());
 
-        //while(true){
+        while(true){
             //bariera czasowa i transmitera danych
             /*try {
                 //??
@@ -116,7 +116,7 @@ public class Game {
             gameManager.collisionUpdate();
             gameManager.afterUpdate();
             gameManager.closeCycle();
-        //}
+        }
     }
 
     private void runClientMode(){
