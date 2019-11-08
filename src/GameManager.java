@@ -32,7 +32,7 @@ public class GameManager implements Updateable, Drawable{
             dataQueue = new ConcurrentLinkedQueue<>();
             collisionQueue = new ConcurrentLinkedQueue<>();
             afterQueue = new ConcurrentLinkedQueue<>();
-            barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS);
+            barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
             barrierPeroidRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
 
             dataReady = false;

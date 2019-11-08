@@ -37,7 +37,7 @@ public class Game {
                 } catch (BrokenBarrierException e) {
                     e.printStackTrace();
                 }finally {
-                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+                    //gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
                 }
 
                 while(true){
@@ -56,7 +56,7 @@ public class Game {
                 } catch (BrokenBarrierException e) {
                     e.printStackTrace();
                 }finally {
-                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+                    //gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
                 }
 
                 while(true){
@@ -75,7 +75,7 @@ public class Game {
                 } catch (BrokenBarrierException e) {
                     e.printStackTrace();
                 }finally {
-                    gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+                    //gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
                 }
             //}
         }
@@ -123,10 +123,38 @@ public class Game {
             }*/
 
             gameManager.prepareCycle();
+
             gameManager.dataUpdate();
+        try {
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }finally {
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+        }
             gameManager.collisionUpdate();
+        try {
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }finally {
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+        }
             gameManager.afterUpdate();
-            gameManager.closeCycle();
+        try {
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }finally {
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+        }
+        gameManager.closeCycle();
         //}
     }
 
