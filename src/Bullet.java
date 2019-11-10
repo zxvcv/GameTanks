@@ -5,11 +5,14 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     static final double BULLET_SPEED = 2.0;
     static final double BULLET_DMG = 10;
     private Tank owner;
+    private int num; //test
+    private int threadNum; //test
 
     Bullet(Position position, Rotation rotation, Tank owner){
         this.position = position;
         this.rotation = rotation;
         this.owner = owner;
+        num = GameManager.countBull++; //test
     }
 
     public Tank getOwner(){
@@ -28,6 +31,8 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void dataUpdate() {
+        System.out.println("dataUpdate - Bullet" + num + " " + threadNum);
+        /*
         if(rotation.getRotation() == 0)
             move(GameTime.deltaTime() * BULLET_SPEED, 0);
         if(rotation.getRotation() == 90)
@@ -36,10 +41,13 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
             move(GameTime.deltaTime() * BULLET_SPEED * (-1), 0);
         if(rotation.getRotation() == 270)
             move(0, GameTime.deltaTime() * BULLET_SPEED * (-1));
+         */
     }
 
     @Override
     public void collisionUpdate() {
+        System.out.println("collisionUpdate - Bullet" + num + " " + threadNum);
+        /*
         GameManager gm = Game.getGameManager();
         LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
         if(collisions.isEmpty())
@@ -51,10 +59,12 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
             }
         }
         this.destroy();
+         */
     }
 
     @Override
     public void afterUpdate() {
+        System.out.println("afterUpdate - Bullet" + num + " " + threadNum);
         //---
     }
 
@@ -77,5 +87,9 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     @Override
     public double distanceToBound(Shiftable p2){
         return 0;
+    }
+
+    public void setThread(int th){ //test
+        threadNum = th;
     }
 }

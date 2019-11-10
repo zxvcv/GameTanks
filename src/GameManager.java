@@ -1,8 +1,10 @@
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
 public class GameManager implements Updateable, Drawable{
+    public static int countBull = 0; //test
+    public static int countTank = 0; //test
+
     private volatile boolean dataReady;
     private volatile boolean collisionReady;
     private volatile boolean afterReady;
@@ -10,10 +12,12 @@ public class GameManager implements Updateable, Drawable{
     private ConcurrentLinkedQueue<GameObject> collisionQueue;
     private ConcurrentLinkedQueue<GameObject> afterQueue;
     private CyclicBarrier barrierTaskRuntime;
+    private CyclicBarrier barrierPeroidRuntime;
     private CyclicBarrier barrierTransmitters; //ilosc zalezy od ilosci graczy
     public enum BarrierNum{
         TASK_BARRIER,
-        TRANSMITTER_BARRIER
+        TRANSMITTER_BARRIER,
+        PEROID_BARRIER
     }
 
     private ConcurrentLinkedQueue<Tank> tanks;
@@ -26,7 +30,8 @@ public class GameManager implements Updateable, Drawable{
             dataQueue = new ConcurrentLinkedQueue<>();
             collisionQueue = new ConcurrentLinkedQueue<>();
             afterQueue = new ConcurrentLinkedQueue<>();
-            barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS);
+            barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
+            barrierPeroidRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
 
             dataReady = false;
             collisionReady = false;
@@ -83,10 +88,28 @@ public class GameManager implements Updateable, Drawable{
     }
 
     public CyclicBarrier getBarrier(BarrierNum barrierNum) {
-        if(barrierNum == BarrierNum.TASK_BARRIER)
-            return barrierTaskRuntime;
-        else
-            return barrierTransmitters;
+        switch (barrierNum){
+            case TASK_BARRIER: return barrierTaskRuntime;
+            case TRANSMITTER_BARRIER: return barrierTransmitters;
+            case PEROID_BARRIER: return barrierPeroidRuntime;
+            default: return barrierTaskRuntime;
+        }
+    }
+
+    public void setBarrier(BarrierNum barrierNum, CyclicBarrier barrier){
+        switch (barrierNum){
+            case TASK_BARRIER:
+                barrierTaskRuntime = barrier;
+                break;
+            case TRANSMITTER_BARRIER:
+                barrierTransmitters = barrier;
+                break;
+            case PEROID_BARRIER:
+                barrierPeroidRuntime = barrier;
+                break;
+            default:
+                break;
+        }
     }
 
     private void clearReadyFlags(){
@@ -97,7 +120,6 @@ public class GameManager implements Updateable, Drawable{
 
     public void prepareCycle(){
         clearReadyFlags();
-        this.notifyAll();
     }
 
     public void closeCycle(){
