@@ -1,7 +1,13 @@
 public class Player implements GameObject{
-    private DataTransmitter transmitter;
+    //private DataTransmitter transmitter;
     private Tank tank;
     private int points;
+
+    public Player(){
+        //this.transmitter = transmitter;
+        this.tank = null;
+        this.points = 0;
+    }
 
     public synchronized void addPoints(int pt){
         points += pt;
@@ -13,6 +19,10 @@ public class Player implements GameObject{
 
     public int getPoints(){
         return points;
+    }
+
+    public synchronized void setTank(Tank tank){
+        this.tank = tank;
     }
 
     public synchronized void remTank(){
@@ -43,5 +53,10 @@ public class Player implements GameObject{
     public void destroy() {
         tank.destroy();
         Game.getGameManager().getPlayers().remove(this);
+    }
+
+    @Override
+    public void setThread(int th) { //test
+
     }
 }

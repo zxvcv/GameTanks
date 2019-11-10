@@ -90,12 +90,28 @@ public class GameManager implements Updateable, Drawable{
     }
 
     public CyclicBarrier getBarrier(BarrierNum barrierNum) {
-        if(barrierNum == BarrierNum.TASK_BARRIER)
-            return barrierTaskRuntime;
-        else if(barrierNum == BarrierNum.TRANSMITTER_BARRIER)
-            return barrierTransmitters;
-        else
-            return barrierPeroidRuntime;
+        switch (barrierNum){
+            case TASK_BARRIER: return barrierTaskRuntime;
+            case TRANSMITTER_BARRIER: return barrierTransmitters;
+            case PEROID_BARRIER: return barrierPeroidRuntime;
+            default: return barrierTaskRuntime;
+        }
+    }
+
+    public void setBarrier(BarrierNum barrierNum, CyclicBarrier barrier){
+        switch (barrierNum){
+            case TASK_BARRIER:
+                barrierTaskRuntime = barrier;
+                break;
+            case TRANSMITTER_BARRIER:
+                barrierTransmitters = barrier;
+                break;
+            case PEROID_BARRIER:
+                barrierPeroidRuntime = barrier;
+                break;
+            default:
+                break;
+        }
     }
 
     private void clearReadyFlags(){
@@ -105,33 +121,7 @@ public class GameManager implements Updateable, Drawable{
     }
 
     public void prepareCycle(){
-        //----do testu
-        Tank t1 = new Tank(new Position(1f, 1f), new Rotation(1), new Player());
-        tanks.add(t1);
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t1));
-        Tank t2 = new Tank(new Position(1f, 1f), new Rotation(1), new Player());
-        tanks.add(t2);
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
-        bullets.add(new Bullet(new Position(1f, 1f), new Rotation(1), t2));
-        //----koniec do testu
-
         clearReadyFlags();
-        try {
-            barrierPeroidRuntime.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        }finally {
-            barrierPeroidRuntime.reset();
-        }
     }
 
     public void closeCycle(){
@@ -163,4 +153,6 @@ public class GameManager implements Updateable, Drawable{
     public void display(){
 
     }
+
+
 }

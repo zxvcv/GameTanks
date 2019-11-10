@@ -8,6 +8,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     private Player player;
     private Position previousPosition;
     private int num; //test
+    private int threadNum; //test
 
     public Tank(Tank tank){
         this.hp = tank.hp;
@@ -54,13 +55,13 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void dataUpdate() {
-        System.out.println("dataUpdate - Tank" + num);
+        System.out.println("dataUpdate - Tank" + num + " " + threadNum);
         //zmiana watosci po otrzymaniu danych od gracza
     }
 
     @Override
     public void collisionUpdate() {
-        System.out.println("collisionUpdate - Tank" + num);
+        System.out.println("collisionUpdate - Tank" + num + " " + threadNum);
         /*
         GameManager gm = Game.getGameManager();
         LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
@@ -75,7 +76,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void afterUpdate() {
-        System.out.println("afterUpdate - Tank" + num);
+        System.out.println("afterUpdate - Tank" + num + " " + threadNum);
         //---
     }
 
@@ -109,5 +110,9 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
                 collisions.add(t);
         }
         return collisions;
+    }
+
+    public void setThread(int th){ //test
+        threadNum = th;
     }
 }
