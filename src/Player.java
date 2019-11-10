@@ -1,10 +1,8 @@
 public class Player implements GameObject{
-    //private DataTransmitter transmitter;
     private Tank tank;
     private int points;
 
     public Player(){
-        //this.transmitter = transmitter;
         this.tank = null;
         this.points = 0;
     }
