@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Bullet extends Transformable implements GameObject, CollisionManager{
+public class Bullet extends Transformable implements GameObject, CollisionManager, Sendable{
     static final double BULLET_SPEED = 2.0;
     static final double BULLET_DMG = 10;
     private Tank owner;

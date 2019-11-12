@@ -1,4 +1,4 @@
-public class Player implements GameObject{
+public class Player implements GameObject, Sendable{
     private Tank tank;
     private int points;
 
@@ -25,6 +25,10 @@ public class Player implements GameObject{
 
     public synchronized void remTank(){
         tank = null;
+    }
+
+    public Tank getTank(){
+        return tank;
     }
 
     @Override

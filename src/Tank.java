@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Tank extends Transformable implements GameObject, Shootable, CollisionManager{
+public class Tank extends Transformable implements GameObject, Shootable, CollisionManager, Sendable{
     static final double TANK_SPEED = 1.0;
     static final double TANK_BASIC_HP = 100;
     private double hp;

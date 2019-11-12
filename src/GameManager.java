@@ -55,6 +55,10 @@ public class GameManager implements Updateable, Drawable{
         return map;
     }
 
+    public void setMap(Map map){
+        this.map = map;
+    }
+
     public ConcurrentLinkedQueue<Bullet> getBullets(){
         return bullets;
     }

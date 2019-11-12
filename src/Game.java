@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -28,9 +30,7 @@ public class Game {
                 GameObject go;
                 try {
                     gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (BrokenBarrierException e) {
+                } catch (InterruptedException | BrokenBarrierException e) {
                     e.printStackTrace();
                 }
 
@@ -47,9 +47,7 @@ public class Game {
 
                 try {
                     gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (BrokenBarrierException e) {
+                } catch (InterruptedException | BrokenBarrierException e) {
                     e.printStackTrace();
                 }
 
@@ -66,9 +64,7 @@ public class Game {
 
                 try {
                     gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (BrokenBarrierException e) {
+                } catch (InterruptedException | BrokenBarrierException e) {
                     e.printStackTrace();
                 }
 
@@ -85,9 +81,7 @@ public class Game {
 
                 try {
                     gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (BrokenBarrierException e) {
+                } catch (InterruptedException | BrokenBarrierException e) {
                     e.printStackTrace();
                 }
             //}
@@ -95,37 +89,105 @@ public class Game {
     }
 
     class ClientTask implements Runnable {
+
         @Override
         public void run() {
-            while(true){
+            //while(true){
+                //blokada rysowania
+                //...
 
-            }
+                //rysowanie obiektów na ekranie
+                //...
+            //}
         }
     }
 
     class ServerDataTransmitter implements Runnable {
         private Player player;
         private Socket socket;
+        private ObjectOutputStream outputStream;
+        private ObjectInputStream inputStream;
 
-        public ServerDataTransmitter(Player player, Socket socket){
+        public ServerDataTransmitter(Player player, Socket socket) throws IOException {
             this.player = player;
             this.socket = socket;
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            inputStream = new ObjectInputStream(socket.getInputStream());
         }
 
         @Override
         public void run() {
+            Player updatedPlayer;
+            GameMessage message;
 
-
-            //watek wymiany danych z graczem player
-            //while(true){
+            //wstrzymanie transmisji danych początkowych aż do dołączenia wszystkich graczy
             try {
                 gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (BrokenBarrierException e) {
+            } catch (InterruptedException | BrokenBarrierException e) {
                 e.printStackTrace();
             }
+
+            //wyslanie danych poczatkowych gry
+            try {
+                for(Player p : gameManager.getPlayers())
+                    outputStream.writeObject(p);
+                for(Tank t : gameManager.getTanks())
+                    outputStream.writeObject(t);
+                for(Bullet b : gameManager.getBullets())
+                    outputStream.writeObject(b);
+                outputStream.writeObject(gameManager.getMap());
+                outputStream.writeObject(new GameMessage("DATA_END"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            //oczekiwanie na potwierdzenie gotowości do gry
+            try {
+                do {
+                    message = (GameMessage)inputStream.readObject();
+                }while (!message.getMessage().matches("READY"));
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace(); return;
+            }
+
+            //wstrzymanie transmisji danych pomiedzy klentem a serverem do rozpoczecia gry
+            try {
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+            } catch (InterruptedException | BrokenBarrierException e) {
+                e.printStackTrace();
+            }
+
+            //while(true){
+            try {
+                message = (GameMessage)inputStream.readObject();
+                if(message.getMessage().matches(""))
+                    updatedPlayer = (Player)inputStream.readObject();
+                else if(message.getMessage().matches("EXIT"));
+                    //break;
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+            } catch (InterruptedException | BrokenBarrierException e) {
+                e.printStackTrace();
+            }
+
+            //wysyłanie danych zaktualizowanych obiektów
+            //...
+
             //}
+
+            try {
+                inputStream.close();
+                outputStream.close();
+                gameManager.getTanks().remove(player.getTank());
+                gameManager.getPlayers().remove(player);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            //trzeba sprawdzać jednego gracza mniej przy TRANSMITTER_BARRIER !!!
         }
     }
 
@@ -133,7 +195,7 @@ public class Game {
         return gameManager;
     }
 
-    private void runServerMode() {
+    private void runServerMode() throws BrokenBarrierException, InterruptedException {
         gameManager = new GameManager(true);
         ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS);
 
@@ -145,13 +207,12 @@ public class Game {
         do{
             System.out.print("set number of players [1-4]: ");
             playersNum = consoleIn.nextInt();
-            if(playersNum < 1 || playersNum > 4)
-                System.out.println("[I] incorrect number of players");
-            else if(playersNum == 0) {
+            if(playersNum == 0) {
                 System.out.println("[I] server shutdown");
                 return;
-            }
-            else{
+            }else if(playersNum < 1 || playersNum > 4) {
+                System.out.println("[I] incorrect number of players");
+            }else{
                 break;
             }
         }while(true);
@@ -166,7 +227,7 @@ public class Game {
         //dołączanie graczy do gry
         Socket incoming;
         Player newPlayer;
-        for(int i=playersNum; i>0; --i){
+        for(int i = playersNum; i > 0; --i){
             try {
                 incoming = serverSocket.accept();
             } catch (IOException e) {
@@ -177,7 +238,12 @@ public class Game {
             //jezeli odebrano polaczenie to stwórz nowego gracza i transmiter danych
             newPlayer = new Player();
             gameManager.getPlayers().add(newPlayer);
-            executorService.execute(new ServerDataTransmitter(newPlayer, incoming));
+            try {
+                executorService.execute(new ServerDataTransmitter(newPlayer, incoming));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
         }
 
         //ustawienie bariery dla transmiterów
@@ -192,78 +258,48 @@ public class Game {
                 gameManager.getBullets().add(new Bullet(new Position(1f, 1f), new Rotation(1), tank));
         }
 
-        //wyslanie danych poczatkowych gry do kazdego z graczy i oczekiwanie na potwierdzenie rozpoczecia
-        //rozgrywki przez każdego z nich
-        //...
+        //wysyłanie danych początkowych gry az do dołączenia wszystkich graczy
+        gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+        gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).reset();
+
+        //wyslanie danych poczatkowych gry do kazdego z graczy (ServerDataTransmitter)
+
+        //wstrzymanie transmisji danych pomiedzy klentem a serverem do rozpoczecia gry
+        gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+        gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).reset();
 
         //while(true){
-
-        //bariera transmitera danych
-        try {
-            gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        }finally {
-            gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).reset();
-        }
-
         gameManager.prepareCycle();
 
-        try {
-            gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        }finally {
-            gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).reset();
-        }
+        gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
+        gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).reset();
 
         gameManager.dataUpdate();
 
-        try {
-            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        } finally {
-            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
-        }
+        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
 
         gameManager.collisionUpdate();
 
-        try {
-            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        } finally {
-            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
-        }
+        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
 
         gameManager.afterUpdate();
 
-        try {
-            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        } finally {
-            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
-        }
+        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
 
         gameManager.closeCycle();
+
+        //wstrzymanie wysyłania danych do klienta na czas obliczeń
+        gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+        gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).reset();
         //}
 
         executorService.shutdown();
     }
 
-    private void runClientMode(){
+    private void runClientMode() throws IOException, ClassNotFoundException {
         gameManager = new GameManager(false);
 
         //łączenie z serverem
@@ -288,17 +324,42 @@ public class Game {
             break;
         } while(true);
 
-        //oczekiwanie na otrzymanie danych poczatkowych gry
-        //...
+        ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+        ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+
+        //oczekiwanie na otrzymanie danych poczatkowych gry i odbiór tych danych
+        Sendable data;
+        GameMessage message = new GameMessage("");
+        do{
+            data = (Sendable)inputStream.readObject();
+            if(data instanceof Player)
+                gameManager.getPlayers().add((Player)data);
+            else if(data instanceof Tank)
+                gameManager.getTanks().add((Tank)data);
+            else if(data instanceof Bullet)
+                gameManager.getBullets().add((Bullet)data);
+            else if(data instanceof Map)
+                gameManager.setMap((Map)data);
+            else if(data instanceof GameMessage)
+                message = (GameMessage) message;
+        }while(!message.getMessage().matches("DATA_END"));
 
         //potwierdzenie otrzymania danych poczatkowych i gotowosci do gry
-        //...
+        message.setMessage("READY");
+        outputStream.writeObject(message);
 
         while(true){
+            //wykrycie poczynan gracza i wysłanie ich do servera
             //bariera czasowa i transmitera danych
             //...
 
             //cykl gry
+            //...
+
+            //odebranie przeliczonych danych z servera
+            //...
+
+            //odblokowanie rysowania obiektów na ekranie (ClientThread)
             //...
         }
     }
@@ -307,13 +368,17 @@ public class Game {
         Game game = new Game();
 
         //wybór trybu aplikacji (client/server)
-        if(args[0].matches("server"))
-            game.runServerMode();
-        else if(args[0].matches("client"))
-            game.runClientMode();
-        else {
-            System.out.println("[I] unknown parameter");
-            System.out.println("[I] program shutdown");
+        try {
+            if (args[0].matches("server"))
+                game.runServerMode();
+            else if (args[0].matches("client"))
+                game.runClientMode();
+            else {
+                System.out.println("[I] unknown parameter");
+                System.out.println("[I] program shutdown");
+            }
+        } catch (InterruptedException | IOException | BrokenBarrierException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }
