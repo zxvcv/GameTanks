@@ -1,12 +1,19 @@
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.util.Scanner;
 import java.util.concurrent.*;
 
 public class Game {
     static final int SERVER_THREADS = 4;
     static final int MAX_PLAYERS = 4;
+    static final int SERVER_SOCKET_NUM = 8100;
     static int threadnum = 0; //test
 
     private static GameManager gameManager;
-    private static ExecutorService executorService;
+    private ServerSocket serverSocket;
 
     class ServerTask implements Runnable {
         int num = 0; //test
@@ -91,26 +98,24 @@ public class Game {
         @Override
         public void run() {
             while(true){
-                try{
-                    gameManager.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
 
-                //...
             }
         }
     }
 
     class ServerDataTransmitter implements Runnable {
         private Player player;
+        private Socket socket;
 
-        public ServerDataTransmitter(Player player){
+        public ServerDataTransmitter(Player player, Socket socket){
             this.player = player;
+            this.socket = socket;
         }
 
         @Override
         public void run() {
+
+
             //watek wymiany danych z graczem player
             //while(true){
             try {
@@ -130,23 +135,56 @@ public class Game {
 
     private void runServerMode() {
         gameManager = new GameManager(true);
-        executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS);
+        ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS);
 
         for (int i = 0; i < SERVER_THREADS; ++i)
             executorService.execute(new ServerTask());
 
+        int playersNum;
+        Scanner consoleIn = new Scanner(System.in);
+        do{
+            System.out.print("set number of players [1-4]: ");
+            playersNum = consoleIn.nextInt();
+            if(playersNum < 1 || playersNum > 4)
+                System.out.println("[I] incorrect number of players");
+            else if(playersNum == 0) {
+                System.out.println("[I] server shutdown");
+                return;
+            }
+            else{
+                break;
+            }
+        }while(true);
+
+        try {
+            serverSocket = new ServerSocket(SERVER_SOCKET_NUM);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
         //dołączanie graczy do gry
-        Player p = new Player();
-        gameManager.getPlayers().add(p);
-        p = new Player();
-        gameManager.getPlayers().add(p);
+        Socket incoming;
+        Player newPlayer;
+        for(int i=playersNum; i>0; --i){
+            try {
+                incoming = serverSocket.accept();
+            } catch (IOException e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            //jezeli odebrano polaczenie to stwórz nowego gracza i transmiter danych
+            newPlayer = new Player();
+            gameManager.getPlayers().add(newPlayer);
+            executorService.execute(new ServerDataTransmitter(newPlayer, incoming));
+        }
 
         //ustawienie bariery dla transmiterów
         gameManager.setBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER, new CyclicBarrier(gameManager.getPlayers().size()+1));
 
-        //tworzenie czołgów i transmiterów danych dla graczy (plus dla testu kilka pocisków)
+        //tworzenie czołgów dla graczy (plus dla testu kilka pocisków)
         for(Player player : gameManager.getPlayers()){
-            executorService.execute(new ServerDataTransmitter(player));
             Tank tank = new Tank(new Position(1f, 1f), new Rotation(1), player);
             gameManager.getTanks().add(tank);
             player.setTank(tank);
@@ -154,6 +192,9 @@ public class Game {
                 gameManager.getBullets().add(new Bullet(new Position(1f, 1f), new Rotation(1), tank));
         }
 
+        //wyslanie danych poczatkowych gry do kazdego z graczy i oczekiwanie na potwierdzenie rozpoczecia
+        //rozgrywki przez każdego z nich
+        //...
 
         //while(true){
 
@@ -225,17 +266,54 @@ public class Game {
     private void runClientMode(){
         gameManager = new GameManager(false);
 
+        //łączenie z serverem
+        Socket socket  = new Socket();
+        Scanner consoleIn = new Scanner(System.in);
+        String hostName;
+        do{
+            System.out.print("set host name, or 0 to exit: ");
+            hostName = consoleIn.nextLine();
+            if(hostName.matches("0")) {
+                System.out.println("[I] server shutdown");
+                return;
+            }
+
+            try {
+                socket.connect(new InetSocketAddress(hostName, SERVER_SOCKET_NUM), 5000);
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("[I] unable to connect to the server");
+                continue;
+            }
+            break;
+        } while(true);
+
+        //oczekiwanie na otrzymanie danych poczatkowych gry
+        //...
+
+        //potwierdzenie otrzymania danych poczatkowych i gotowosci do gry
+        //...
+
         while(true){
             //bariera czasowa i transmitera danych
+            //...
 
+            //cykl gry
+            //...
         }
     }
 
     public static void main(String[] args){
         Game game = new Game();
-        //wybór trybu aplikacji (client/server)
 
-        //uruchomienie odpowiedzniego trybu
-        game.runServerMode();
+        //wybór trybu aplikacji (client/server)
+        if(args[0].matches("server"))
+            game.runServerMode();
+        else if(args[0].matches("client"))
+            game.runClientMode();
+        else {
+            System.out.println("[I] unknown parameter");
+            System.out.println("[I] program shutdown");
+        }
     }
 }
