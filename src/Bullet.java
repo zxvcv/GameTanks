@@ -31,7 +31,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void dataUpdate() {
-        System.out.println("dataUpdate - Bullet" + num + " " + threadNum);
+        System.out.println("dataUpdate - Bullet" + num + " " + threadNum + " " + this.getIndex());
         /*
         if(rotation.getRotation() == 0)
             move(GameTime.deltaTime() * BULLET_SPEED, 0);
@@ -46,7 +46,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void collisionUpdate() {
-        System.out.println("collisionUpdate - Bullet" + num + " " + threadNum);
+        System.out.println("collisionUpdate - Bullet" + num + " " + threadNum + " " + this.getIndex());
         /*
         GameManager gm = Game.getGameManager();
         LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
@@ -64,7 +64,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void afterUpdate() {
-        System.out.println("afterUpdate - Bullet" + num + " " + threadNum);
+        System.out.println("afterUpdate - Bullet" + num + " " + threadNum + " " + this.getIndex());
         //---
     }
 

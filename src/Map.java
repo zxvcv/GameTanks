@@ -1,6 +1,6 @@
 import java.util.LinkedList;
 
-public class Map implements Drawable, Sendable{
+public class Map extends Indexable implements Drawable, Sendable{
     public static final int MAP_SIZE = 25; //always square
     private Block[][] mapBlocks;
 

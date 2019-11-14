@@ -55,13 +55,13 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void dataUpdate() {
-        System.out.println("dataUpdate - Tank" + num + " " + threadNum);
+        System.out.println("dataUpdate - Tank" + num + " " + threadNum + " " + this.getIndex());
         //zmiana watosci po otrzymaniu danych od gracza
     }
 
     @Override
     public void collisionUpdate() {
-        System.out.println("collisionUpdate - Tank" + num + " " + threadNum);
+        System.out.println("collisionUpdate - Tank" + num + " " + threadNum + " " + this.getIndex());
         /*
         GameManager gm = Game.getGameManager();
         LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
@@ -76,7 +76,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void afterUpdate() {
-        System.out.println("afterUpdate - Tank" + num + " " + threadNum);
+        System.out.println("afterUpdate - Tank" + num + " " + threadNum + " " + this.getIndex());
         //---
     }
 

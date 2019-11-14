@@ -1,6 +1,6 @@
 import static java.lang.Math.*;
 
-public abstract class Shiftable implements Movable{
+public abstract class Shiftable extends Indexable implements Movable{
     protected Position position;
 
     public Position getPosition(){

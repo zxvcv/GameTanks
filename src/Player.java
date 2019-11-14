@@ -1,4 +1,4 @@
-public class Player implements GameObject, Sendable{
+public class Player extends Indexable implements GameObject, Sendable{
     private Tank tank;
     private int points;
 
