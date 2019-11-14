@@ -111,8 +111,8 @@ public class Game {
         public ServerDataTransmitter(Player player, Socket socket) throws IOException {
             this.player = player;
             this.socket = socket;
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            inputStream = new ObjectInputStream(socket.getInputStream());
+            //outputStream = new ObjectOutputStream(socket.getOutputStream());
+            //inputStream = new ObjectInputStream(socket.getInputStream());
         }
 
         @Override
@@ -202,6 +202,18 @@ public class Game {
         for (int i = 0; i < SERVER_THREADS; ++i)
             executorService.execute(new ServerTask());
 
+        //testowe dane
+        gameManager.getPlayers().add(new Player());
+        gameManager.getPlayers().add(new Player());
+        for(Player player : gameManager.getPlayers()){
+            Tank tank = new Tank(new Position(1f, 1f), new Rotation(1), player);
+            gameManager.getTanks().add(tank);
+            player.setTank(tank);
+            for(int i=0; i<5; ++i)
+                gameManager.getBullets().add(new Bullet(new Position(1f, 1f), new Rotation(1), tank));
+        }
+
+        /*
         int playersNum;
         Scanner consoleIn = new Scanner(System.in);
         do{
@@ -267,6 +279,7 @@ public class Game {
         //wstrzymanie transmisji danych pomiedzy klentem a serverem do rozpoczecia gry
         gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
         gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).reset();
+        */
 
         //while(true){
         gameManager.prepareCycle();
@@ -291,9 +304,11 @@ public class Game {
 
         gameManager.closeCycle();
 
+        /*
         //wstrzymanie wysyłania danych do klienta na czas obliczeń
         gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
         gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).reset();
+        */
         //}
 
         executorService.shutdown();
@@ -369,6 +384,12 @@ public class Game {
 
         //wybór trybu aplikacji (client/server)
         try {
+            game.runServerMode();
+        } catch (BrokenBarrierException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        /*
+        try {
             if (args[0].matches("server"))
                 game.runServerMode();
             else if (args[0].matches("client"))
@@ -380,5 +401,6 @@ public class Game {
         } catch (InterruptedException | IOException | BrokenBarrierException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+        */
     }
 }
