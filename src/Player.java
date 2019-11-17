@@ -1,10 +1,18 @@
 public class Player extends Indexable implements GameObject, Sendable{
     private Tank tank;
     private int points;
+    private PlayerState playerState;
+
+    public enum PlayerState{
+        ACTIVE,
+        UNACTIVE,
+        EXIT
+    }
 
     public Player(){
         this.tank = null;
         this.points = 0;
+        this.playerState = PlayerState.ACTIVE;
     }
 
     public synchronized void addPoints(int pt){
@@ -17,6 +25,14 @@ public class Player extends Indexable implements GameObject, Sendable{
 
     public int getPoints(){
         return points;
+    }
+
+    public PlayerState getState() {
+        return playerState;
+    }
+
+    public void setState(PlayerState playerState) {
+        this.playerState = playerState;
     }
 
     public synchronized void setTank(Tank tank){

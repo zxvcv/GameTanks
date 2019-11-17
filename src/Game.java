@@ -120,20 +120,23 @@ public class Game {
             Player updatedPlayer;
             GameMessage message;
 
-            //bariera transmiterów (T1) - oczekiwanie na dolaczenie wszystkich graczy
+            //wysłanie obiektu gracza w celu uzgodnienia indeksu gracza
             try {
-                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-            } catch (InterruptedException | BrokenBarrierException e) {
+                outputStream.writeObject(player);
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            //bariera transmiterów (T2) - oczekiwanie na przygotowanie danych poczatkowych gry
             try {
+                //bariera transmiterów (T1) - oczekiwanie na dolaczenie wszystkich graczy
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
+
+                //bariera transmiterów (T2) - oczekiwanie na przygotowanie danych poczatkowych gry
                 gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
                 gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
             } catch (InterruptedException | BrokenBarrierException e) {
-                e.printStackTrace();
+                e.printStackTrace(); return;
             }
 
             //wyslanie danych poczatkowych gry
@@ -147,7 +150,7 @@ public class Game {
                 outputStream.writeObject(gameManager.getMap());
                 outputStream.writeObject(new GameMessage("DATA_END"));
             } catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(); return;
             }
 
             //oczekiwanie na potwierdzenie gotowości do gry
@@ -164,55 +167,61 @@ public class Game {
                 gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
                 gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
             } catch (InterruptedException | BrokenBarrierException e) {
-                e.printStackTrace();
+                e.printStackTrace(); return;
             }
 
             //wysłanie sygnału startu gry do wszystkich klientów
-            //...
+            try {
+                outputStream.writeObject(new GameMessage("START"));
+            } catch (IOException e) {
+                e.printStackTrace(); return;
+            }
 
             //while(true){
 
             //odbieranie danych klienta
             try {
                 message = (GameMessage)inputStream.readObject();
-                if(message.getMessage().matches(""))
-                    updatedPlayer = (Player)inputStream.readObject();
-                else if(message.getMessage().matches("EXIT")){
+                if(message.getMessage().matches("UNACTIVE")){
                     //ustawienie klienta w stan nieaktywny
-                    //...
-                }
+                    updatedPlayer = (Player)inputStream.readObject();
+                    updatedPlayer.setState(Player.PlayerState.UNACTIVE);
+                } else if (message.getMessage().matches("EXIT")){
+                    //ustawienie klienta w stan konczacy jego prace
+                    updatedPlayer = new Player();
+                    updatedPlayer.setState(Player.PlayerState.EXIT);
+                }else
+                    updatedPlayer = (Player)inputStream.readObject();
+
             } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+                e.printStackTrace(); return;
             }
 
-            //bariera transmiterów (T4) - oczekiwanie na dane klientów
             try {
+                //bariera transmiterów (T4) - oczekiwanie na dane klientów
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
+
+                //bariera transmiterów (T5) - oczekiwanie na zakończenie obliczeń
                 gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
                 gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
             } catch (InterruptedException | BrokenBarrierException e) {
-                e.printStackTrace();
+                e.printStackTrace(); return;
             }
 
-            //bariera transmiterów (T5) - oczekiwanie na zakończenie obliczeń
-            try {
-                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-            } catch (InterruptedException | BrokenBarrierException e) {
-                e.printStackTrace();
-            }
-
-            //wysyłanie danych zaktualizowanych obiektów do klientów w stanie aktywnym
+            //wysyłanie danych zaktualizowanych obiektów do klientów w stanie aktywnym i nieaktywnym
             //...
 
-            //usuwanie nieaktywnych graczy i zmniejszenie bariery transmitterów
+            //usuwanie graczy wychodzących z gry i zmniejszenie bariery transmitterów
             try {
-                //if(gracz nieaktywny){
+                if(updatedPlayer.getState() == Player.PlayerState.EXIT){
                     inputStream.close();
                     outputStream.close();
                     gameManager.getTanks().remove(player.getTank());
                     gameManager.getPlayers().remove(player);
-                    //zmniejszenie wielkiości TRANSMITTER_BARRIER
-                //}
+                }
+                //zmniejszenie wielkiości TRANSMITTER_BARRIER
+                //...
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -221,9 +230,10 @@ public class Game {
             try {
                 gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
                 gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-            } catch (InterruptedException | BrokenBarrierException e) {
+            } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            } catch (BrokenBarrierException e){}
+
 
             //}
         }
@@ -378,6 +388,7 @@ public class Game {
 
     private void runClientMode() throws IOException, ClassNotFoundException, BrokenBarrierException, InterruptedException {
         gameManager = new GameManager(false);
+        int playerIndex;
 
         //łączenie z serverem
         Socket socket  = new Socket();
@@ -407,6 +418,10 @@ public class Game {
         //uruchomienie wątku GUI klienta (Client Task)
         //...
 
+        //obiektu gracza w celu uzgodnienia indeksu gracza
+        Player player = (Player) inputStream.readObject();
+        playerIndex = player.getIndex();
+
         //oczekiwanie na otrzymanie danych poczatkowych gry i odbiór tych danych
         Sendable data;
         GameMessage message = new GameMessage("");
@@ -421,21 +436,32 @@ public class Game {
             else if(data instanceof Map)
                 gameManager.setMap((Map)data);
             else if(data instanceof GameMessage)
-                message = (GameMessage) message;
+                message = (GameMessage) data;
         }while(!message.getMessage().matches("DATA_END"));
 
         //potwierdzenie otrzymania danych poczatkowych i gotowosci do gry
         message.setMessage("READY");
         outputStream.writeObject(message);
 
-        //oczekiwanie na  sygnał startu gry od servera
-        //...
+        //oczekiwanie na sygnał startu gry od servera
+        message = new GameMessage("");
+        do{
+            data = (Sendable)inputStream.readObject();
+            if(data instanceof GameMessage)
+                message = (GameMessage) data;
+        }while(!message.getMessage().matches("START"));
 
         while(true){
-            //wykrycie poczynan gracza i wysłanie ich do servera
+            //wykrycie poczynan gracza
             //...
 
-            //odebranie przeliczonych danych z servera i aktualizacja danych
+            //wysłanie danych do servera
+            //...
+
+            //odebranie przeliczonych danych z servera
+            //...
+
+            //aktualizacja danych
             //...
         }
     }
