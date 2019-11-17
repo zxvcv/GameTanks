@@ -116,6 +116,24 @@ public class GameManager implements Updateable, Drawable{
         }
     }
 
+    public synchronized void resetBarrier(BarrierNum barrierNum){
+        switch (barrierNum){
+            case TASK_BARRIER:
+                if(barrierTaskRuntime.isBroken())
+                    barrierTaskRuntime.reset();
+                break;
+            case TRANSMITTER_BARRIER:
+                if(barrierTransmitters.isBroken())
+                    barrierTransmitters.reset();
+                break;
+            case PEROID_BARRIER:
+                if(barrierPeroidRuntime.isBroken())
+                    barrierPeroidRuntime.reset();
+                break;
+            default:
+        }
+    }
+
     private void clearReadyFlags(){
         dataReady = false;
         collisionReady = false;
