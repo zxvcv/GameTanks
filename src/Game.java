@@ -209,8 +209,18 @@ public class Game {
                 e.printStackTrace(); return;
             }
 
-            //wysyłanie danych zaktualizowanych obiektów do klientów w stanie aktywnym i nieaktywnym
-            //...
+            //wysyłanie danych zaktualizowanych obiektów do klientów w stanie aktywnym i nieaktywnym (wszyscy gracze, czolgi i pociski)
+            try {
+                for(Player p : gameManager.getPlayers())
+                    outputStream.writeObject(p);
+                for(Tank t : gameManager.getTanks())
+                    outputStream.writeObject(t);
+                for(Bullet b : gameManager.getBullets())
+                    outputStream.writeObject(b);
+                outputStream.writeObject(new GameMessage("DATA_END"));
+            } catch (IOException e) {
+                e.printStackTrace(); return;
+            }
 
             //usuwanie graczy wychodzących z gry i zmniejszenie bariery transmitterów
             try {
@@ -456,12 +466,34 @@ public class Game {
             //...
 
             //wysłanie danych do servera
-            //...
+            message = new GameMessage("");
+            try {
+                outputStream.writeObject(message);
+                outputStream.writeObject(player);
+            } catch (IOException e) {
+                e.printStackTrace(); return;
+            }
 
-            //odebranie przeliczonych danych z servera
-            //...
+            //odebranie przeliczonych danych z servera i aktualizacja danych
+            do{
+                data = (Sendable)inputStream.readObject();
+                if(data instanceof Player) {
+                    for(Player p : gameManager.getPlayers())
+                        if(p.compareTo((Player) data) == 0)
+                            p = (Player) data;
+                } else if(data instanceof Tank){
+                    for(Tank t : gameManager.getTanks())
+                        if(t.compareTo((Tank) data) == 0)
+                            t = (Tank) data;
+                } else if(data instanceof Bullet) {
+                    for (Bullet b : gameManager.getBullets())
+                        if (b.compareTo((Bullet) data) == 0)
+                            b = (Bullet) data;
+                } else if(data instanceof GameMessage)
+                    message = (GameMessage) data;
+            }while(!message.getMessage().matches("DATA_END"));
 
-            //aktualizacja danych
+            //wstrzymanie czasu gry
             //...
         }
     }

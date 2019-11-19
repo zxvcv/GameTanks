@@ -1,4 +1,4 @@
-public abstract class Indexable {
+public abstract class Indexable implements Comparable<Indexable>{
     private static int objectsIndex = 0;
     private int index;
 
@@ -20,5 +20,15 @@ public abstract class Indexable {
             return true;
         else
             return false;
+    }
+
+    @Override
+    public int compareTo(Indexable o) {
+        if(this.getIndex() == o.getIndex())
+            return 0;
+        else if(this.getIndex() > o.getIndex())
+            return 1;
+        else
+            return -1;
     }
 }
