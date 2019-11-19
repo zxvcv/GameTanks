@@ -77,4 +77,11 @@ public class Player extends Indexable implements GameObject, Sendable{
     public void setThread(int th) { //test
 
     }
+
+    @Override
+    public String toString(){
+        String str;
+        str = "Player" + this.getIndex();
+        return str;
+    }
 }

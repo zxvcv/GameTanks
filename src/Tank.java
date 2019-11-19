@@ -115,4 +115,11 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     public void setThread(int th){ //test
         threadNum = th;
     }
+
+    @Override
+    public String toString(){
+        String str;
+        str = "Tank" + this.getIndex();
+        return str;
+    }
 }

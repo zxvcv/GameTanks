@@ -92,4 +92,11 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     public void setThread(int th){ //test
         threadNum = th;
     }
+
+    @Override
+    public String toString(){
+        String str;
+        str = "Bullet" + this.getIndex();
+        return str;
+    }
 }

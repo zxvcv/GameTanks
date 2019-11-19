@@ -449,6 +449,15 @@ public class Game {
                 message = (GameMessage) data;
         }while(!message.getMessage().matches("DATA_END"));
 
+        ///test przychodzacych daych
+        for(Player p : gameManager.getPlayers())
+            System.out.println(p);
+        for(Tank t : gameManager.getTanks())
+            System.out.println(t);
+        for(Bullet b : gameManager.getBullets())
+            System.out.println(b);
+        ///koniec testu
+
         //potwierdzenie otrzymania danych poczatkowych i gotowosci do gry
         message.setMessage("READY");
         outputStream.writeObject(message);
@@ -461,7 +470,7 @@ public class Game {
                 message = (GameMessage) data;
         }while(!message.getMessage().matches("START"));
 
-        while(true){
+        //while(true){
             //wykrycie poczynan gracza
             //...
 
@@ -495,7 +504,7 @@ public class Game {
 
             //wstrzymanie czasu gry
             //...
-        }
+        //}
     }
 
     public static void main(String[] args){

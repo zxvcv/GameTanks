@@ -1,4 +1,4 @@
-public class Rotation implements Rotatable{
+public class Rotation implements Rotatable, Sendable{
     int rotation;
 
     public Rotation(int _rotation){

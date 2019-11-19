@@ -1,4 +1,4 @@
-public class Position implements Movable{
+public class Position implements Movable, Sendable{
     private double x;
     private double y;
 
