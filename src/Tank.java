@@ -82,7 +82,8 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void shoot() {
-        Game.getGameManager().getBullets().add(new Bullet(this.position, this.rotation, this));
+        Bullet newBullet = new Bullet(this.position, this.rotation, this);
+        Game.getGameManager().getBullets().add(newBullet);
     }
 
     @Override

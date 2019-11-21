@@ -26,7 +26,9 @@ public class Game {
 
         @Override
         public void run() {
+
             //while(true){
+            for(int i=0; i<2; ++i){
                 GameObject go;
                 try {
                     gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
@@ -84,7 +86,7 @@ public class Game {
                 } catch (InterruptedException | BrokenBarrierException e) {
                     e.printStackTrace();
                 }
-            //}
+            }
         }
     }
 
@@ -117,7 +119,6 @@ public class Game {
 
         @Override
         public void run() {
-            Player updatedPlayer;
             GameMessage message;
 
             //wysłanie obiektu gracza w celu uzgodnienia indeksu gracza
@@ -178,74 +179,67 @@ public class Game {
             }
 
             //while(true){
-
-            //odbieranie danych klienta
-            try {
-                message = (GameMessage)inputStream.readObject();
-                if(message.getMessage().matches("UNACTIVE")){
-                    //ustawienie klienta w stan nieaktywny
-                    updatedPlayer = (Player)inputStream.readObject();
-                    updatedPlayer.setState(Player.PlayerState.UNACTIVE);
-                } else if (message.getMessage().matches("EXIT")){
-                    //ustawienie klienta w stan konczacy jego prace
-                    updatedPlayer = new Player();
-                    updatedPlayer.setState(Player.PlayerState.EXIT);
-                }else
-                    updatedPlayer = (Player)inputStream.readObject();
-
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace(); return;
-            }
-
-            try {
-                //bariera transmiterów (T4) - oczekiwanie na dane klientów
-                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-
-                //bariera transmiterów (T5) - oczekiwanie na zakończenie obliczeń
-                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-            } catch (InterruptedException | BrokenBarrierException e) {
-                e.printStackTrace(); return;
-            }
-
-            //wysyłanie danych zaktualizowanych obiektów do klientów w stanie aktywnym i nieaktywnym (wszyscy gracze, czolgi i pociski)
-            try {
-                for(Player p : gameManager.getPlayers())
-                    outputStream.writeObject(p);
-                for(Tank t : gameManager.getTanks())
-                    outputStream.writeObject(t);
-                for(Bullet b : gameManager.getBullets())
-                    outputStream.writeObject(b);
-                outputStream.writeObject(new GameMessage("DATA_END"));
-            } catch (IOException e) {
-                e.printStackTrace(); return;
-            }
-
-            //usuwanie graczy wychodzących z gry i zmniejszenie bariery transmitterów
-            try {
-                if(updatedPlayer.getState() == Player.PlayerState.EXIT){
-                    inputStream.close();
-                    outputStream.close();
-                    gameManager.getTanks().remove(player.getTank());
-                    gameManager.getPlayers().remove(player);
+            for(int i=0; i<2; ++i){
+                //odbieranie wiadomosci klienta
+                try {
+                    message = (GameMessage)inputStream.readObject();
+                    GameMessage messageToSave;
+                    while(!message.getMessage().matches("DATA_END")){
+                        messageToSave = new GameMessage(message);
+                        gameManager.getMessageQueue().add(messageToSave);
+                        message = (GameMessage)inputStream.readObject();
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace(); return;
                 }
-                //zmniejszenie wielkiości TRANSMITTER_BARRIER
-                //...
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                try {
+                    //bariera transmiterów (T4) - oczekiwanie na dane klientów
+                    gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+                    gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
+
+                    //bariera transmiterów (T5) - oczekiwanie na zakończenie obliczeń
+                    gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+                    gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
+                } catch (InterruptedException | BrokenBarrierException e) {
+                    e.printStackTrace(); return;
+                }
+
+                //wysyłanie danych zaktualizowanych obiektów do klientów w stanie aktywnym i nieaktywnym (wszyscy gracze, czolgi i pociski)
+                try {
+                    for(Player p : gameManager.getPlayers())
+                        outputStream.writeObject(p);
+                    for(Tank t : gameManager.getTanks())
+                        outputStream.writeObject(t);
+                    for(Bullet b : gameManager.getBullets())
+                        outputStream.writeObject(b);
+                    outputStream.writeObject(new GameMessage("DATA_END"));
+                } catch (IOException e) {
+                    e.printStackTrace(); return;
+                }
+
+                //usuwanie graczy wychodzących z gry i zmniejszenie bariery transmitterów
+                try {
+                    if(player.getState() == Player.PlayerState.EXIT){
+                        inputStream.close();
+                        outputStream.close();
+                        gameManager.getTanks().remove(player.getTank());
+                        gameManager.getPlayers().remove(player);
+                    }
+                    //zmniejszenie wielkiości TRANSMITTER_BARRIER
+                    //...
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                //bariera transmiterów (T6) - oczekiwanie na usuniecie niaktywnych klientów
+                try {
+                    gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+                    gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (BrokenBarrierException e){}
             }
-
-            //bariera transmiterów (T6) - oczekiwanie na usuniecie niaktywnych klientów
-            try {
-                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (BrokenBarrierException e){}
-
-
-            //}
         }
     }
 
@@ -323,8 +317,6 @@ public class Game {
             Tank tank = new Tank(new Position(1f, 1f), new Rotation(1), player);
             gameManager.getTanks().add(tank);
             player.setTank(tank);
-            for(int i=0; i<5; ++i)
-                gameManager.getBullets().add(new Bullet(new Position(1f, 1f), new Rotation(1), tank));
         }
 
         //bariera transmiterów (T2) - oczekiwanie na przygotowanie danych poczatkowych gry
@@ -344,54 +336,53 @@ public class Game {
         }
 
         //while(true){
+        for(int i=0; i<2; ++i){
+            //bariera transmiterów (T4) - oczekiwanie na dane klientów
+            try {
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
+            } catch (InterruptedException | BrokenBarrierException e) {
+                e.printStackTrace();
+            }
 
-        //bariera transmiterów (T4) - oczekiwanie na dane klientów
-        try {
-            gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-            gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-        } catch (InterruptedException | BrokenBarrierException e) {
-            e.printStackTrace();
+            gameManager.prepareCycle();
+
+            gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
+            gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).reset();
+
+            gameManager.dataUpdate();
+
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+
+            gameManager.collisionUpdate();
+
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+
+            gameManager.afterUpdate();
+
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
+            gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+
+            gameManager.closeCycle();
+
+            //bariera transmiterów (T5) - oczekiwanie na zakończenie obliczeń
+            try {
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
+            } catch (InterruptedException | BrokenBarrierException e) {
+                e.printStackTrace();
+            }
+
+            //bariera transmiterów (T6) - oczekiwanie na usuniecie niaktywnych klientów
+            try {
+                gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
+                gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
+            } catch (InterruptedException | BrokenBarrierException e) {
+                e.printStackTrace();
+            }
         }
-
-        gameManager.prepareCycle();
-
-        gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
-        gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).reset();
-
-        gameManager.dataUpdate();
-
-        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
-
-        gameManager.collisionUpdate();
-
-        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
-
-        gameManager.afterUpdate();
-
-        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
-        gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
-
-        gameManager.closeCycle();
-
-        //bariera transmiterów (T5) - oczekiwanie na zakończenie obliczeń
-        try {
-            gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-            gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-        } catch (InterruptedException | BrokenBarrierException e) {
-            e.printStackTrace();
-        }
-
-        //bariera transmiterów (T6) - oczekiwanie na usuniecie niaktywnych klientów
-        try {
-            gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
-            gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
-        } catch (InterruptedException | BrokenBarrierException e) {
-            e.printStackTrace();
-        }
-
-        //}
 
         executorService.shutdown();
     }
@@ -433,10 +424,10 @@ public class Game {
         playerIndex = player.getIndex();
 
         //oczekiwanie na otrzymanie danych poczatkowych gry i odbiór tych danych
-        Sendable data;
+        Object data;
         GameMessage message = new GameMessage("");
         do{
-            data = (Sendable)inputStream.readObject();
+            data = inputStream.readObject();
             if(data instanceof Player)
                 gameManager.getPlayers().add((Player)data);
             else if(data instanceof Tank)
@@ -450,12 +441,14 @@ public class Game {
         }while(!message.getMessage().matches("DATA_END"));
 
         ///test przychodzacych daych
+        System.out.println("###DANE_POCZATKOWE:");
         for(Player p : gameManager.getPlayers())
             System.out.println(p);
         for(Tank t : gameManager.getTanks())
             System.out.println(t);
         for(Bullet b : gameManager.getBullets())
             System.out.println(b);
+        System.out.println("###END_DANE_POCZATKOWE\n");
         ///koniec testu
 
         //potwierdzenie otrzymania danych poczatkowych i gotowosci do gry
@@ -465,46 +458,61 @@ public class Game {
         //oczekiwanie na sygnał startu gry od servera
         message = new GameMessage("");
         do{
-            data = (Sendable)inputStream.readObject();
+            data = inputStream.readObject();
             if(data instanceof GameMessage)
                 message = (GameMessage) data;
         }while(!message.getMessage().matches("START"));
 
         //while(true){
+        for(int i=0; i<2; ++i){
             //wykrycie poczynan gracza
             //...
+            //poczynania gracza zapisane jako wiadomosci w kolejce gameManager.MessageQueue
+            gameManager.getMessageQueue().add(new GameMessage("SHOOT", playerIndex));
 
-            //wysłanie danych do servera
-            message = new GameMessage("");
+            //wysłanie wszystkich wiadomosci do servera
             try {
-                outputStream.writeObject(message);
-                outputStream.writeObject(player);
+                synchronized (gameManager.getMessageQueue()){
+                    for(GameMessage m : gameManager.getMessageQueue())
+                        outputStream.writeObject(m);
+                    gameManager.getMessageQueue().clear();
+                }
+                outputStream.writeObject(new GameMessage("DATA_END"));
             } catch (IOException e) {
                 e.printStackTrace(); return;
             }
 
             //odebranie przeliczonych danych z servera i aktualizacja danych
+            gameManager.getPlayers().clear();
+            gameManager.getBullets().clear();
+            gameManager.getTanks().clear();
+            message = new GameMessage("");
             do{
-                data = (Sendable)inputStream.readObject();
+                data = inputStream.readObject();
                 if(data instanceof Player) {
-                    for(Player p : gameManager.getPlayers())
-                        if(p.compareTo((Player) data) == 0)
-                            p = (Player) data;
+                    gameManager.getPlayers().add((Player) data);
                 } else if(data instanceof Tank){
-                    for(Tank t : gameManager.getTanks())
-                        if(t.compareTo((Tank) data) == 0)
-                            t = (Tank) data;
+                    gameManager.getTanks().add((Tank) data);
                 } else if(data instanceof Bullet) {
-                    for (Bullet b : gameManager.getBullets())
-                        if (b.compareTo((Bullet) data) == 0)
-                            b = (Bullet) data;
+                    gameManager.getBullets().add((Bullet) data);
                 } else if(data instanceof GameMessage)
                     message = (GameMessage) data;
             }while(!message.getMessage().matches("DATA_END"));
 
+            ///test przychodzacych daych
+            System.out.println("###DANE_GRY:");
+            for(Player p : gameManager.getPlayers())
+                System.out.println(p);
+            for(Tank t : gameManager.getTanks())
+                System.out.println(t);
+            for(Bullet b : gameManager.getBullets())
+                System.out.println(b);
+            System.out.println("###END_DANE_GRY\n");
+            ///koniec testu
+
             //wstrzymanie czasu gry
             //...
-        //}
+        }
     }
 
     public static void main(String[] args){

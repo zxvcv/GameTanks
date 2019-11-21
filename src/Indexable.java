@@ -1,5 +1,5 @@
 public abstract class Indexable implements Comparable<Indexable>{
-    private static int objectsIndex = 0;
+    private static int objectsIndex = 1;
     private int index;
 
     public Indexable(){
