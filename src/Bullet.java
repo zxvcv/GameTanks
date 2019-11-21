@@ -5,14 +5,12 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     static final double BULLET_SPEED = 2.0;
     static final double BULLET_DMG = 10;
     private Tank owner;
-    private int num; //test
     private int threadNum; //test
 
     Bullet(Position position, Rotation rotation, Tank owner){
         this.position = position;
         this.rotation = rotation;
         this.owner = owner;
-        num = GameManager.countBull++; //test
     }
 
     public Tank getOwner(){
@@ -31,7 +29,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void dataUpdate() {
-        System.out.println("dataUpdate - Bullet" + num + " " + threadNum + " " + this.getIndex());
+        System.out.println("dataUpdate - Bullet \t\tT: " + threadNum + " \tI: " + this.getIndex());
         /*
         if(rotation.getRotation() == 0)
             move(GameTime.deltaTime() * BULLET_SPEED, 0);
@@ -46,7 +44,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void collisionUpdate() {
-        System.out.println("collisionUpdate - Bullet" + num + " " + threadNum + " " + this.getIndex());
+        System.out.println("collisionUpdate - Bullet \tT: " + threadNum + " \tI: " + this.getIndex());
         /*
         GameManager gm = Game.getGameManager();
         LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
@@ -64,7 +62,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void afterUpdate() {
-        System.out.println("afterUpdate - Bullet" + num + " " + threadNum + " " + this.getIndex());
+        System.out.println("afterUpdate - Bullet \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //---
     }
 

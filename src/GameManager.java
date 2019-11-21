@@ -2,9 +2,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
 public class GameManager implements Updateable, Drawable{
-    public static int countBull = 0; //test
-    public static int countTank = 0; //test
-
     private volatile boolean dataReady;
     private volatile boolean collisionReady;
     private volatile boolean afterReady;

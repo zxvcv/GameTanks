@@ -2,6 +2,7 @@ public class Player extends Indexable implements GameObject, Sendable{
     private Tank tank;
     private int points;
     private PlayerState playerState;
+    private int threadNum; //test
 
     public enum PlayerState{
         ACTIVE,
@@ -54,19 +55,19 @@ public class Player extends Indexable implements GameObject, Sendable{
 
     @Override
     public void dataUpdate() {
-        System.out.println("dataUpdate - Player" + this.getIndex());
+        System.out.println("dataUpdate - Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 
     @Override
     public void collisionUpdate() {
-        System.out.println("collisionUpdate - Player" + this.getIndex());
+        System.out.println("collisionUpdate - Player \tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 
     @Override
     public void afterUpdate() {
-        System.out.println("afterUpdate - Player" + this.getIndex());
+        System.out.println("afterUpdate - Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 
@@ -78,7 +79,7 @@ public class Player extends Indexable implements GameObject, Sendable{
 
     @Override
     public void setThread(int th) { //test
-
+        threadNum = th;
     }
 
     @Override
