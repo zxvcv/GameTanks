@@ -1,3 +1,5 @@
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
@@ -12,6 +14,7 @@ public class GameManager implements Updateable, Drawable{
     private CyclicBarrier barrierTaskRuntime;
     private CyclicBarrier barrierPeroidRuntime;
     private CyclicBarrier barrierTransmitters; //ilosc zalezy od ilosci graczy
+
     public enum BarrierNum{
         TASK_BARRIER,
         TRANSMITTER_BARRIER,
@@ -149,15 +152,23 @@ public class GameManager implements Updateable, Drawable{
         for(GameMessage gm : messageQueue) {
             System.out.println(gm.getMessage() + " " + gm.getOwnerIndex());
 
-            if(gm.getMessage().matches("SHOOT")) {
-                for (Player p : players) {
+            if(gm.getMessage().matches("SHOOT"))
+                for (Player p : players)
                     if (p.getIndex() == gm.getOwnerIndex()) {
                         p.getTank().shoot();
                         break;
                     }
-                }
-            }
 
+            if(gm.getMessage().matches("SHOW")) {
+                System.out.println("###DANE:");
+                for(Player p : players)
+                    System.out.println(p);
+                for(Tank t : tanks)
+                    System.out.println(t);
+                for(Bullet b : bullets)
+                    System.out.println(b);
+                System.out.println("###END_DANE\n");
+            }
         }
     }
 

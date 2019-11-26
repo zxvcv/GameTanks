@@ -55,19 +55,19 @@ public class Player extends Indexable implements GameObject, Sendable{
 
     @Override
     public void dataUpdate() {
-        System.out.println("dataUpdate - Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("dataUpdate - Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 
     @Override
     public void collisionUpdate() {
-        System.out.println("collisionUpdate - Player \tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("collisionUpdate - Player \tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 
     @Override
     public void afterUpdate() {
-        System.out.println("afterUpdate - Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("afterUpdate - Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 

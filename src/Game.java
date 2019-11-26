@@ -1,3 +1,5 @@
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -27,8 +29,8 @@ public class Game {
         @Override
         public void run() {
 
-            //while(true){
-            for(int i=0; i<2; ++i){
+            while(true){
+            //for(int i=0; i<2; ++i){
                 GameObject go;
                 try {
                     gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
@@ -90,16 +92,29 @@ public class Game {
         }
     }
 
-    class ClientTask implements Runnable {
+    class ClientTask implements Runnable{
+        private int playerIndex;
+
+        ClientTask(int index){
+            playerIndex = index;
+        }
+
+        @Override
+        public void run() {
+            new UserKeyListener(playerIndex);
+        }
+    }
+
+    class ClientGUITask implements Runnable {
 
         @Override
         public void run() {
             //while(true){
-                //blokada rysowania
-                //...
+            //blokada rysowania
+            //...
 
-                //rysowanie obiektów na ekranie
-                //...
+            //rysowanie obiektów na ekranie
+            //...
             //}
         }
     }
@@ -178,8 +193,8 @@ public class Game {
                 e.printStackTrace(); return;
             }
 
-            //while(true){
-            for(int i=0; i<2; ++i){
+            while(true){
+            //for(int i=0; i<2; ++i){
                 //odbieranie wiadomosci klienta
                 try {
                     message = (GameMessage)inputStream.readObject();
@@ -335,8 +350,8 @@ public class Game {
             e.printStackTrace();
         }
 
-        //while(true){
-        for(int i=0; i<2; ++i){
+        while(true){
+        //for(int i=0; i<2; ++i){
             //bariera transmiterów (T4) - oczekiwanie na dane klientów
             try {
                 gameManager.getBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER).await();
@@ -384,11 +399,12 @@ public class Game {
             }
         }
 
-        executorService.shutdown();
+        //executorService.shutdown();
     }
 
     private void runClientMode() throws IOException, ClassNotFoundException, BrokenBarrierException, InterruptedException {
         gameManager = new GameManager(false);
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
         int playerIndex;
 
         //łączenie z serverem
@@ -423,6 +439,8 @@ public class Game {
         Player player = (Player) inputStream.readObject();
         playerIndex = player.getIndex();
 
+        executorService.execute(new ClientTask(playerIndex));
+
         //oczekiwanie na otrzymanie danych poczatkowych gry i odbiór tych danych
         Object data;
         GameMessage message = new GameMessage("");
@@ -440,6 +458,7 @@ public class Game {
                 message = (GameMessage) data;
         }while(!message.getMessage().matches("DATA_END"));
 
+    /*
         ///test przychodzacych daych
         System.out.println("###DANE_POCZATKOWE:");
         for(Player p : gameManager.getPlayers())
@@ -450,6 +469,7 @@ public class Game {
             System.out.println(b);
         System.out.println("###END_DANE_POCZATKOWE\n");
         ///koniec testu
+    */
 
         //potwierdzenie otrzymania danych poczatkowych i gotowosci do gry
         message.setMessage("READY");
@@ -463,12 +483,10 @@ public class Game {
                 message = (GameMessage) data;
         }while(!message.getMessage().matches("START"));
 
-        //while(true){
-        for(int i=0; i<2; ++i){
-            //wykrycie poczynan gracza
+        while(true){
+        //for(int i=0; i<2; ++i){
+            //wykrywanie poczynan gracz aw klase UserKeyListener
             //...
-            //poczynania gracza zapisane jako wiadomosci w kolejce gameManager.MessageQueue
-            gameManager.getMessageQueue().add(new GameMessage("SHOOT", playerIndex));
 
             //wysłanie wszystkich wiadomosci do servera
             try {
@@ -499,6 +517,7 @@ public class Game {
                     message = (GameMessage) data;
             }while(!message.getMessage().matches("DATA_END"));
 
+
             ///test przychodzacych daych
             System.out.println("###DANE_GRY:");
             for(Player p : gameManager.getPlayers())
@@ -510,9 +529,12 @@ public class Game {
             System.out.println("###END_DANE_GRY\n");
             ///koniec testu
 
+
             //wstrzymanie czasu gry
             //...
         }
+
+        //executorService.shutdownNow();
     }
 
     public static void main(String[] args){
