@@ -1,5 +1,3 @@
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
@@ -26,21 +24,15 @@ public class GameManager implements Updateable, Drawable{
     private ConcurrentLinkedQueue<Bullet> bullets;
     private ConcurrentLinkedQueue<Player> players;
 
-    public GameManager(boolean isThisServer){
-        if(isThisServer){
-            dataQueue = new ConcurrentLinkedQueue<>();
-            collisionQueue = new ConcurrentLinkedQueue<>();
-            afterQueue = new ConcurrentLinkedQueue<>();
-            barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
-            barrierPeroidRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
+    public GameManager(){
+        dataQueue = new ConcurrentLinkedQueue<>();
+        collisionQueue = new ConcurrentLinkedQueue<>();
+        afterQueue = new ConcurrentLinkedQueue<>();
+        barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
+        barrierPeroidRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
 
-            dataReady = false;
-            collisionReady = false;
-            afterReady = false;
-        }
-        else{
-            //inicjalizacja dla wersji Klienta
-        }
+        dataReady = false;
+        collisionReady = false;afterReady = false;
 
         tanks = new ConcurrentLinkedQueue<>();
         map = new Map();
