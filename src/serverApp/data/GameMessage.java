@@ -1,4 +1,8 @@
-public class GameMessage implements Sendable{
+package serverApp.data;
+
+import serverApp.abstractObjects.Sendable;
+
+public class GameMessage implements Sendable {
     private String message;
     private int playerIndex;
 

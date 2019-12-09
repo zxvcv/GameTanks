@@ -1,7 +1,12 @@
+package serverApp.data;
+
+import serverApp.Game;
+import serverApp.abstractObjects.*;
+
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Bullet extends Transformable implements GameObject, CollisionManager, Sendable{
+public class Bullet extends Transformable implements GameObject, CollisionManager, Sendable {
     static final double BULLET_SPEED = 2.0;
     static final double BULLET_DMG = 10;
     private Tank owner;
@@ -29,31 +34,31 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void dataUpdate() {
-        //System.out.println("dataUpdate - Bullet \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("dataUpdate - serverApp.data.Bullet \t\tT: " + threadNum + " \tI: " + this.getIndex());
         /*
         if(rotation.getRotation() == 0)
-            move(GameTime.deltaTime() * BULLET_SPEED, 0);
+            move(serverApp.GameTime.deltaTime() * BULLET_SPEED, 0);
         if(rotation.getRotation() == 90)
-            move(0, GameTime.deltaTime() * BULLET_SPEED);
+            move(0, serverApp.GameTime.deltaTime() * BULLET_SPEED);
         if(rotation.getRotation() == 180)
-            move(GameTime.deltaTime() * BULLET_SPEED * (-1), 0);
+            move(serverApp.GameTime.deltaTime() * BULLET_SPEED * (-1), 0);
         if(rotation.getRotation() == 270)
-            move(0, GameTime.deltaTime() * BULLET_SPEED * (-1));
+            move(0, serverApp.GameTime.deltaTime() * BULLET_SPEED * (-1));
          */
     }
 
     @Override
     public void collisionUpdate() {
-        //System.out.println("collisionUpdate - Bullet \tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("collisionUpdate - serverApp.data.Bullet \tT: " + threadNum + " \tI: " + this.getIndex());
         /*
-        GameManager gm = Game.getGameManager();
-        LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
+        serverApp.GameManager gm = serverApp.Game.getGameManager();
+        LinkedList<serverApp.abstractObjects.Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
         if(collisions.isEmpty())
             return;
-        for(Drawable o : collisions){
-            if(o instanceof Tank){
+        for(serverApp.abstractObjects.Drawable o : collisions){
+            if(o instanceof serverApp.data.Tank){
                 owner.getPlayer().addPoints(20);
-                ((Tank) o).hit(BULLET_DMG);
+                ((serverApp.data.Tank) o).hit(BULLET_DMG);
             }
         }
         this.destroy();
@@ -62,7 +67,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void afterUpdate() {
-        //System.out.println("afterUpdate - Bullet \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("afterUpdate - serverApp.data.Bullet \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //---
     }
 
@@ -94,7 +99,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     @Override
     public String toString(){
         String str;
-        str = "Bullet" + this.getIndex();
+        str = "serverApp.data.Bullet" + this.getIndex();
         return str;
     }
 }

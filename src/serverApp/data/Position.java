@@ -1,4 +1,9 @@
-public class Position implements Movable, Sendable{
+package serverApp.data;
+
+import serverApp.abstractObjects.Movable;
+import serverApp.abstractObjects.Sendable;
+
+public class Position implements Movable, Sendable {
     private double x;
     private double y;
 

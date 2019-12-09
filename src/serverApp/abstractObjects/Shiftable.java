@@ -1,3 +1,7 @@
+package serverApp.abstractObjects;
+
+import serverApp.data.Position;
+
 import static java.lang.Math.*;
 
 public abstract class Shiftable extends Indexable implements Movable{

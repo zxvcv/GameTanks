@@ -1,4 +1,9 @@
-public class Rotation implements Rotatable, Sendable{
+package serverApp.data;
+
+import serverApp.abstractObjects.Rotatable;
+import serverApp.abstractObjects.Sendable;
+
+public class Rotation implements Rotatable, Sendable {
     int rotation;
 
     public Rotation(int _rotation){

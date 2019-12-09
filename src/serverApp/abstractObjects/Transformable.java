@@ -1,4 +1,8 @@
-public abstract class Transformable extends Shiftable implements Rotatable{
+package serverApp.abstractObjects;
+
+import serverApp.data.Rotation;
+
+public abstract class Transformable extends Shiftable implements Rotatable {
     protected Rotation rotation;
 
     Rotation getRotation(){

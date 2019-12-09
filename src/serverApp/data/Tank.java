@@ -1,7 +1,13 @@
+package serverApp.data;
+
+import serverApp.Game;
+import serverApp.GameManager;
+import serverApp.abstractObjects.*;
+
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class Tank extends Transformable implements GameObject, Shootable, CollisionManager, Sendable{
+public class Tank extends Transformable implements GameObject, Shootable, CollisionManager, Sendable {
     static final double TANK_SPEED = 1.0;
     static final double TANK_BASIC_HP = 100;
     private double hp;
@@ -52,20 +58,20 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void dataUpdate() {
-        //System.out.println("dataUpdate - Tank \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("dataUpdate - serverApp.data.Tank \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //zmiana watosci po otrzymaniu danych od gracza
     }
 
     @Override
     public void collisionUpdate() {
-        //System.out.println("collisionUpdate - Tank \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("collisionUpdate - serverApp.data.Tank \t\tT: " + threadNum + " \tI: " + this.getIndex());
         /*
-        GameManager gm = Game.getGameManager();
-        LinkedList<Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
+        serverApp.GameManager gm = serverApp.Game.getGameManager();
+        LinkedList<serverApp.abstractObjects.Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
         if(collisions.isEmpty())
             return;
-        for(Drawable o : collisions){
-            if(o instanceof Block || o instanceof Tank)
+        for(serverApp.abstractObjects.Drawable o : collisions){
+            if(o instanceof serverApp.abstractObjects.Block || o instanceof serverApp.data.Tank)
                 position.setPosition(previousPosition.getX(), previousPosition.getY()); //cofniecie ruchu (nie mozna sie ruszyc w te strone)
         }
          */
@@ -73,7 +79,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void afterUpdate() {
-        //System.out.println("afterUpdate - Tank \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("afterUpdate - serverApp.data.Tank \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //---
     }
 
@@ -118,7 +124,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     @Override
     public String toString(){
         String str;
-        str = "Tank" + this.getIndex();
+        str = "serverApp.data.Tank" + this.getIndex();
         return str;
     }
 }

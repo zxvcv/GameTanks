@@ -1,6 +1,13 @@
+package serverApp.data;
+
+import serverApp.abstractObjects.Block;
+import serverApp.abstractObjects.Drawable;
+import serverApp.abstractObjects.Indexable;
+import serverApp.abstractObjects.Sendable;
+
 import java.util.LinkedList;
 
-public class Map extends Indexable implements Drawable, Sendable{
+public class Map extends Indexable implements Drawable, Sendable {
     public static final int MAP_SIZE = 25; //always square
     private Block[][] mapBlocks;
 

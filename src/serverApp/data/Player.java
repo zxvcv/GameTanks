@@ -1,4 +1,11 @@
-public class Player extends Indexable implements GameObject, Sendable{
+package serverApp.data;
+
+import serverApp.Game;
+import serverApp.abstractObjects.GameObject;
+import serverApp.abstractObjects.Indexable;
+import serverApp.abstractObjects.Sendable;
+
+public class Player extends Indexable implements GameObject, Sendable {
     private Tank tank;
     private int points;
     private PlayerState playerState;
@@ -55,19 +62,19 @@ public class Player extends Indexable implements GameObject, Sendable{
 
     @Override
     public void dataUpdate() {
-        //System.out.println("dataUpdate - Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("dataUpdate - serverApp.data.Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 
     @Override
     public void collisionUpdate() {
-        //System.out.println("collisionUpdate - Player \tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("collisionUpdate - serverApp.data.Player \tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 
     @Override
     public void afterUpdate() {
-        //System.out.println("afterUpdate - Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
+        //System.out.println("afterUpdate - serverApp.data.Player \t\tT: " + threadNum + " \tI: " + this.getIndex());
         //...
     }
 
@@ -85,7 +92,7 @@ public class Player extends Indexable implements GameObject, Sendable{
     @Override
     public String toString(){
         String str;
-        str = "Player" + this.getIndex();
+        str = "serverApp.data.Player" + this.getIndex();
         return str;
     }
 }

@@ -1,16 +1,23 @@
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+package serverApp;
+
+import serverApp.abstractObjects.Drawable;
+import serverApp.abstractObjects.GameObject;
+import serverApp.abstractObjects.Updateable;
+import serverApp.data.*;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
-public class GameManager implements Updateable, Drawable{
+public class GameManager implements Updateable, Drawable {
     private volatile boolean dataReady;
     private volatile boolean collisionReady;
     private volatile boolean afterReady;
     private ConcurrentLinkedQueue<GameObject> dataQueue;
     private ConcurrentLinkedQueue<GameObject> collisionQueue;
     private ConcurrentLinkedQueue<GameObject> afterQueue;
-    private ConcurrentLinkedQueue<GameMessage> messageQueue;
+    private ConcurrentLinkedQueue<GameMessage> messageQueueReceived;
+    private ConcurrentLinkedQueue<GameMessage> messageQueueToSend;
+    private boolean sendPermit;
     private CyclicBarrier barrierTaskRuntime;
     private CyclicBarrier barrierPeroidRuntime;
     private CyclicBarrier barrierTransmitters; //ilosc zalezy od ilosci graczy
@@ -26,27 +33,25 @@ public class GameManager implements Updateable, Drawable{
     private ConcurrentLinkedQueue<Bullet> bullets;
     private ConcurrentLinkedQueue<Player> players;
 
-    public GameManager(boolean isThisServer){
-        if(isThisServer){
-            dataQueue = new ConcurrentLinkedQueue<>();
-            collisionQueue = new ConcurrentLinkedQueue<>();
-            afterQueue = new ConcurrentLinkedQueue<>();
-            barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
-            barrierPeroidRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
+    public GameManager(){
+        dataQueue = new ConcurrentLinkedQueue<>();
+        collisionQueue = new ConcurrentLinkedQueue<>();
+        afterQueue = new ConcurrentLinkedQueue<>();
+        barrierTaskRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
+        barrierPeroidRuntime = new CyclicBarrier(Game.SERVER_THREADS + 1);
 
-            dataReady = false;
-            collisionReady = false;
-            afterReady = false;
-        }
-        else{
-            //inicjalizacja dla wersji Klienta
-        }
+        dataReady = false;
+        collisionReady = false;
+        afterReady = false;
 
         tanks = new ConcurrentLinkedQueue<>();
         map = new Map();
         bullets = new ConcurrentLinkedQueue<>();
         players = new ConcurrentLinkedQueue<>();
-        messageQueue = new ConcurrentLinkedQueue<>();
+        messageQueueReceived = new ConcurrentLinkedQueue<>();
+        messageQueueToSend = new ConcurrentLinkedQueue<>();
+
+        sendPermit = false;
     }
 
     public ConcurrentLinkedQueue<Tank> getTanks(){
@@ -93,8 +98,12 @@ public class GameManager implements Updateable, Drawable{
         return afterQueue;
     }
 
-    public ConcurrentLinkedQueue<GameMessage> getMessageQueue() {
-        return messageQueue;
+    public ConcurrentLinkedQueue<GameMessage> getMessageQueueToSend() {
+        return messageQueueToSend;
+    }
+
+    public ConcurrentLinkedQueue<GameMessage> getMessageQueueReceived() {
+        return messageQueueReceived;
     }
 
     public CyclicBarrier getBarrier(BarrierNum barrierNum) {
@@ -140,6 +149,14 @@ public class GameManager implements Updateable, Drawable{
         }
     }
 
+    public void setSendPermit(boolean sendPermit) {
+        this.sendPermit = sendPermit;
+    }
+
+    public boolean isSendPermit() {
+        return sendPermit;
+    }
+
     private void clearReadyFlags(){
         dataReady = false;
         collisionReady = false;
@@ -148,32 +165,11 @@ public class GameManager implements Updateable, Drawable{
 
     public void prepareCycle(){
         clearReadyFlags();
-
-        for(GameMessage gm : messageQueue) {
-            System.out.println(gm.getMessage() + " " + gm.getOwnerIndex());
-
-            if(gm.getMessage().matches("SHOOT"))
-                for (Player p : players)
-                    if (p.getIndex() == gm.getOwnerIndex()) {
-                        p.getTank().shoot();
-                        break;
-                    }
-
-            if(gm.getMessage().matches("SHOW")) {
-                System.out.println("###DANE:");
-                for(Player p : players)
-                    System.out.println(p);
-                for(Tank t : tanks)
-                    System.out.println(t);
-                for(Bullet b : bullets)
-                    System.out.println(b);
-                System.out.println("###END_DANE\n");
-            }
-        }
+        sendPermit = false;
     }
 
     public void closeCycle(){
-        messageQueue.clear();
+        sendPermit = true;
     }
 
     @Override
