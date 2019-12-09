@@ -15,17 +15,15 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     private Position previousPosition;
 
     public Tank(Tank tank){
+        super(tank.rotation, tank.position);
         this.hp = tank.hp;
-        this.position = tank.position;
-        this.rotation = tank.rotation;
         this.player = tank.player;
         this.previousPosition = tank.previousPosition;
     }
 
     public Tank(Position position, Rotation rotation, Player player){
+        super(rotation, position);
         this.hp = TANK_BASIC_HP;
-        this.position = position;
-        this.rotation = rotation;
         this.player = player;
         this.previousPosition = new Position(position);
     }

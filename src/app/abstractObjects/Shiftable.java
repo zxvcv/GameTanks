@@ -1,12 +1,18 @@
 package app.abstractObjects;
 
 import app.data.send.Position;
-import app.data.send.Position;
+
+import java.io.Serializable;
 
 import static java.lang.Math.*;
 
-public abstract class Shiftable extends Indexable implements Movable{
+public abstract class Shiftable extends Indexable implements Movable, Serializable {
     protected Position position;
+
+    public Shiftable(Position position){
+        super();
+        this.position = position;
+    }
 
     public Position getPosition(){
         return position;

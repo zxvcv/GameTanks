@@ -1,6 +1,8 @@
 package app.abstractObjects;
 
-public abstract class Indexable implements Comparable<Indexable>{
+import java.io.Serializable;
+
+public abstract class Indexable implements Comparable<Indexable>, Serializable {
     private static int objectsIndex = 1;
     private int index;
 

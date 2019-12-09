@@ -12,7 +12,6 @@ public class Player extends Indexable implements GameObject, Sendable {
     public Player(){
         this.tank = null;
         this.points = 0;
-
     }
 
     public synchronized void addPoints(int pt){

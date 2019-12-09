@@ -12,8 +12,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     private Tank owner;
 
     public Bullet(Position position, Rotation rotation, Tank owner){
-        this.position = position;
-        this.rotation = rotation;
+        super(rotation, position);
         this.owner = owner;
     }
 

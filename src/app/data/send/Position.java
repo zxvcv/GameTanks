@@ -3,7 +3,9 @@ package app.data.send;
 import app.abstractObjects.Movable;
 import app.abstractObjects.Sendable;
 
-public class Position implements Movable, Sendable {
+import java.io.Serializable;
+
+public class Position implements Movable, Serializable {
     private double x;
     private double y;
 

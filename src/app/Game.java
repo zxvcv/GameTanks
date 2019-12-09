@@ -15,18 +15,12 @@ public class Game {
     static final int SERVER_THREADS = 4;
     static final int MAX_PLAYERS = 4;
     static final int SERVER_SOCKET_NUM = 8100;
-    static int threadnum = 0; //test
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS * 3);
     private static GameManager gameManager;
     private ServerSocket serverSocket;
 
     class ServerTask implements Runnable {
-        int num = 0; //test
-
-        public ServerTask(){ //test
-            num = threadnum++;
-        }
 
         @Override
         public void run() {
@@ -172,12 +166,8 @@ public class Game {
             }
 
             ExecutorService executorService = Game.getExecutorService();
-            try {
-                executorService.execute(new ServerDataTransmitterIn(player, inputStream));
-                executorService.execute(new ServerDataTransmitterOut(player, outputStream));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            executorService.execute(new ServerDataTransmitterIn(player, inputStream));
+            executorService.execute(new ServerDataTransmitterOut(player, outputStream));
         }
     }
 
@@ -185,7 +175,7 @@ public class Game {
         private Player player;
         private ObjectInputStream inputStream;
 
-        public ServerDataTransmitterIn(Player player, ObjectInputStream inputStream) throws IOException {
+        public ServerDataTransmitterIn(Player player, ObjectInputStream inputStream) {
             this.player = player;
             this.inputStream = inputStream;
         }
@@ -212,7 +202,7 @@ public class Game {
         private Player player;
         private ObjectOutputStream outputStream;
 
-        public ServerDataTransmitterOut(Player player, ObjectOutputStream outputStream) throws IOException {
+        public ServerDataTransmitterOut(Player player, ObjectOutputStream outputStream) {
             this.player = player;
             this.outputStream = outputStream;
         }
@@ -279,6 +269,7 @@ public class Game {
         //dołączanie graczy do gry
         Socket incoming;
         Player newPlayer;
+        Tank newTank;
         for(int i = playersNum; i > 0; --i){
             try {
                 incoming = serverSocket.accept();
@@ -289,7 +280,10 @@ public class Game {
 
             //jezeli odebrano polaczenie to stwórz nowego gracza i zainicjuj polaczenie
             newPlayer = new Player();
+            newTank = new Tank(new Position(50f, 50f), new Rotation(0), newPlayer);
             gameManager.getPlayers().add(newPlayer);
+            gameManager.getTanks().add(newTank);
+            newPlayer.setTank(newTank);
             try {
                 executorService.execute(new ServerConnector(newPlayer, incoming));
             } catch (IOException e) {
@@ -304,14 +298,6 @@ public class Game {
             gameManager.resetBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER);
         } catch (InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
-        }
-
-
-        //tworzenie czołgów dla graczy (plus dla testu kilka pocisków)
-        for(Player player : gameManager.getPlayers()){
-            Tank tank = new Tank(new Position(1f, 1f), new Rotation(1), player);
-            gameManager.getTanks().add(tank);
-            player.setTank(tank);
         }
 
         //bariera transmiterów (T2) - oczekiwanie na przygotowanie danych poczatkowych gry

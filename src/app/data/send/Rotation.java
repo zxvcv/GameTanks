@@ -3,7 +3,9 @@ package app.data.send;
 import app.abstractObjects.Rotatable;
 import app.abstractObjects.Sendable;
 
-public class Rotation implements Rotatable, Sendable {
+import java.io.Serializable;
+
+public class Rotation implements Rotatable, Serializable {
     int rotation;
 
     public Rotation(int _rotation){
