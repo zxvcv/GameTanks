@@ -111,7 +111,11 @@ public class Game {
             this.player = player;
             this.socket = socket;
             outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            System.out.println("bef inStream init");
+            System.out.println("stream:" + socket.getInputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
+            System.out.println("after inStream init");
         }
 
         @Override
@@ -177,6 +181,8 @@ public class Game {
 
             ExecutorService executorService = Game.getExecutorService();
             try {
+                inputStream.close();
+                outputStream.close();
                 executorService.execute(new ServerDataTransmitterIn(player, socket));
                 executorService.execute(new ServerDataTransmitterOut(player, socket));
             } catch (IOException e) {
@@ -295,7 +301,7 @@ public class Game {
                 continue;
             }
 
-            //jezeli odebrano polaczenie to stwórz nowego gracza i transmiter danych
+            //jezeli odebrano polaczenie to stwórz nowego gracza i zainicjuj polaczenie
             newPlayer = new Player();
             gameManager.getPlayers().add(newPlayer);
             try {
