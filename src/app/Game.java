@@ -325,8 +325,7 @@ public class Game {
 
             while(!messages.isEmpty()){
                 message = messages.poll();
-                //wykonaj dane z wiadomosci
-                //...
+                System.out.println(message.getMessage() + " | " + message.getOwnerIndex());
             }
 
             gameManager.prepareCycle();
