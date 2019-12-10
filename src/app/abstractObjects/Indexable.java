@@ -15,8 +15,8 @@ public abstract class Indexable implements Comparable<Indexable>, Serializable {
         return index;
     }
 
-    public void setIndex(Indexable obj){
-        index = obj.getIndex();
+    public void setIndex(int index){
+        this.index = index;
     }
 
     public static boolean compareIndex(Indexable obj1, Indexable obj2){

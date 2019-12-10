@@ -55,7 +55,33 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void dataUpdate() {
+        String pressed = player.getKeysLog().getPressedKey();
 
+        int speedDivider = 10;
+
+        switch (pressed){
+            case "W":
+                this.rotation.setRotation(90);
+                this.move(0, TANK_SPEED/speedDivider);
+                break;
+            case "A":
+                this.rotation.setRotation(180);
+                this.move(-(TANK_SPEED/speedDivider), 0);
+                break;
+            case "S":
+                this.rotation.setRotation(270);
+                this.move(0, -(TANK_SPEED/speedDivider));
+                break;
+            case "D":
+                this.rotation.setRotation(0);
+                this.move(TANK_SPEED/speedDivider, 0);
+                break;
+            case "SPACE":
+                this.shoot();
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

@@ -106,6 +106,14 @@ public class GameManager implements Updateable, Drawable {
         return messageQueueReceived;
     }
 
+    public Player getPlayerWithIndex(int index){
+        for(Player p : players) {
+            if (p.getIndex() == index)
+                return p;
+        }
+        return null;
+    }
+
     public CyclicBarrier getBarrier(BarrierNum barrierNum) {
         switch (barrierNum){
             case TASK_BARRIER: return barrierTaskRuntime;
@@ -170,6 +178,39 @@ public class GameManager implements Updateable, Drawable {
 
     public void closeCycle(){
         sendPermit = true;
+    }
+
+    public void parseIncomingMessages(){
+        GameMessage message;
+        Player player;
+        String[] messageSplit;
+        int splitLength;
+
+        while(!messageQueueReceived.isEmpty()){
+            message = messageQueueReceived.poll();
+            player = getPlayerWithIndex(message.getIndex());
+            if(player == null)
+                continue;
+
+            messageSplit = message.getMessage().split(" ");
+            splitLength = messageSplit.length;
+
+            if(messageSplit[0].matches("PRESSED"))
+                player.getKeysLog().setKeyState(messageSplit[splitLength-1], true);
+            else if(messageSplit[0].matches("RELEASED"))
+                player.getKeysLog().setKeyState(messageSplit[splitLength-1], false);
+            else if(messageSplit[0].matches("DATA_END"))
+                return;
+        }
+    }
+
+    public void prepareOutputData(){
+        GameMessageData gmd;
+        messageQueueToSend.clear();
+        for(Tank t : tanks)
+            messageQueueToSend.add(new GameMessageData(t));
+        for(Bullet b : bullets)
+            messageQueueToSend.add(new GameMessageData(b));
     }
 
     @Override

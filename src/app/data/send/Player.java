@@ -8,10 +8,12 @@ import app.abstractObjects.Sendable;
 public class Player extends Indexable implements GameObject, Sendable {
     private Tank tank;
     private int points;
+    private KeyLog keysLog;
 
     public Player(){
         this.tank = null;
         this.points = 0;
+        this.keysLog = new KeyLog(getIndex());
     }
 
     public synchronized void addPoints(int pt){
@@ -36,6 +38,10 @@ public class Player extends Indexable implements GameObject, Sendable {
 
     public Tank getTank(){
         return tank;
+    }
+
+    public KeyLog getKeysLog() {
+        return keysLog;
     }
 
     @Override

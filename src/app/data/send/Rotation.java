@@ -20,6 +20,10 @@ public class Rotation implements Rotatable, Serializable {
         return rotation;
     }
 
+    public void setRotation(int rotation){
+        this.rotation = rotation;
+    }
+
     @Override
     public synchronized void rotate(int _rotate){
         rotation += _rotate;

@@ -3,22 +3,22 @@ package app.data.send;
 import app.abstractObjects.Sendable;
 
 public class GameMessage implements Sendable {
-    private String message;
-    private int playerIndex;
+    protected String message;
+    protected int index;
 
     public GameMessage(String message){
         this.message = message;
-        playerIndex = 0;
+        index = 0;
     }
 
     public GameMessage(String message, int playerIndex){
         this.message = message;
-        this.playerIndex = playerIndex;
+        this.index = playerIndex;
     }
 
     public GameMessage(GameMessage gameMessage){
         this.message = gameMessage.message;
-        this.playerIndex = gameMessage.playerIndex;
+        this.index = gameMessage.index;
     }
 
     public void setMessage(String message){
@@ -29,11 +29,11 @@ public class GameMessage implements Sendable {
         return message;
     }
 
-    public void setOwnerIndex(int index){
-        playerIndex = index;
+    public void setIndex(int index){
+        index = index;
     }
 
-    public int getOwnerIndex(){
-        return playerIndex;
+    public int getIndex(){
+        return index;
     }
 }

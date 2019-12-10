@@ -32,17 +32,23 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void dataUpdate() {
-        //System.out.println("dataUpdate - serverApp.data.send.Bullet \t\tT: " + threadNum + " \tI: " + this.getIndex());
-        /*
-        if(rotation.getRotation() == 0)
-            move(serverApp.GameTime.deltaTime() * BULLET_SPEED, 0);
-        if(rotation.getRotation() == 90)
-            move(0, serverApp.GameTime.deltaTime() * BULLET_SPEED);
-        if(rotation.getRotation() == 180)
-            move(serverApp.GameTime.deltaTime() * BULLET_SPEED * (-1), 0);
-        if(rotation.getRotation() == 270)
-            move(0, serverApp.GameTime.deltaTime() * BULLET_SPEED * (-1));
-         */
+        int speedDivider = 10;
+
+        switch (this.rotation.getRotation()){
+            case 0:
+                this.move(BULLET_SPEED/speedDivider, 0);
+                break;
+            case 90:
+                this.move(0, BULLET_SPEED/speedDivider);
+                break;
+            case 180:
+                this.move(-(BULLET_SPEED/speedDivider), 0);
+                break;
+            case 270:
+                this.move(0, -(BULLET_SPEED/speedDivider));
+            default:
+                break;
+        }
     }
 
     @Override

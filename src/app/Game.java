@@ -316,17 +316,12 @@ public class Game {
             e.printStackTrace();
         }
 
-        ConcurrentLinkedQueue<GameMessage> messages =  gameManager.getMessageQueueReceived();
-        GameMessage message;
-
         while(true){
             gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
             gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).reset();
 
-            while(!messages.isEmpty()){
-                message = messages.poll();
-                System.out.println(message.getMessage() + " | " + message.getOwnerIndex());
-            }
+            //odczyt przychodzacych widomosci i pobranie z nich danych
+            gameManager.parseIncomingMessages();
 
             gameManager.prepareCycle();
 
@@ -347,6 +342,8 @@ public class Game {
 
             gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).await();
             gameManager.getBarrier(GameManager.BarrierNum.TASK_BARRIER).reset();
+
+            gameManager.prepareOutputData();
 
             gameManager.closeCycle();
 
