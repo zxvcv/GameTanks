@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Tank extends Transformable implements GameObject, Shootable, CollisionManager, Sendable {
-    static final double TANK_SPEED = 10.0;
+    static final double TANK_SPEED = 5.0;
     static final double TANK_BASIC_HP = 100;
     private double hp;
     private Player player;
@@ -21,15 +21,14 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
         this.player = tank.player;
         this.previousPosition = tank.previousPosition;
         this.shootBlock = false;
-        setIndex(tank.getIndex());
     }
 
     public Tank(Position position, Rotation rotation, Player player, int index){
         super(rotation, position, index);
         this.hp = TANK_BASIC_HP;
         this.player = player;
-        this.shootBlock = false;
         this.previousPosition = new Position(position);
+        this.shootBlock = false;
     }
 
     public double getHp(){
@@ -53,13 +52,13 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     }
 
     @Override
-    public void display() {
-
-    }
-
-    @Override
     public void dataUpdate() {
         String pressed = player.getKeysLog().getPressedKey();
+
+        if(pressed == ""){
+            if(player.getKeysLog().getKey("SPACE"))
+                pressed = "SPACE";
+        }
 
         int speedDivider = 1;
 
@@ -69,16 +68,16 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
         switch (pressed){
             case "W":
-                this.rotation.setRotation(90);
-                this.move(0, TANK_SPEED/speedDivider);
+                this.rotation.setRotation(270);
+                this.move(0, -(TANK_SPEED/speedDivider));
                 break;
             case "A":
                 this.rotation.setRotation(180);
                 this.move(-(TANK_SPEED/speedDivider), 0);
                 break;
             case "S":
-                this.rotation.setRotation(270);
-                this.move(0, -(TANK_SPEED/speedDivider));
+                this.rotation.setRotation(90);
+                this.move(0, TANK_SPEED/speedDivider);
                 break;
             case "D":
                 this.rotation.setRotation(0);
@@ -117,7 +116,17 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void shoot() {
-        Bullet newBullet = new Bullet(this.position, this.rotation, this, Game.getIndexer().getIndex());
+        Position pos = new Position(this.position.getX(), this.position.getY());
+        if(rotation.getRotation() == 0) //w prawo
+            pos = new Position(this.position.getX() + 40, this.position.getY() + 20);
+        if(rotation.getRotation() == 90) // w dol
+            pos = new Position(this.position.getX() + 20, this.position.getY() + 40);
+        if(rotation.getRotation() == 180) //w lewo
+            pos = new Position(this.position.getX(), this.position.getY() + 20);
+        if(rotation.getRotation() == 270) //do gory
+            pos = new Position(this.position.getX() + 20, this.position.getY());
+
+        Bullet newBullet = new Bullet(pos, this.rotation, this, Game.getIndexer().getIndex());
         Game.getGameManager().getBullets().add(newBullet);
     }
 
@@ -128,11 +137,11 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     }
 
     @Override
-    public LinkedList<Drawable> checkCollisions(Map map, ConcurrentLinkedQueue<Tank> tanks, ConcurrentLinkedQueue<Bullet> bullets) {
+    public LinkedList<GameObject> checkCollisions(Map map, ConcurrentLinkedQueue<Tank> tanks, ConcurrentLinkedQueue<Bullet> bullets) {
         GameManager gm = Game.getGameManager();
         Block[] blocks = gm.getMap().getClosestBlocks(this.position);
-        LinkedList<Drawable> collisions = new LinkedList<>();
-
+        LinkedList<GameObject> collisions = new LinkedList<>();
+        /*
         for(Bullet b : bullets){
             if(this.distanceToObj(b) <= 0)
                 collisions.add(b);
@@ -145,6 +154,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
             if(this.distanceToObj(t) <= 0)
                 collisions.add(t);
         }
+        */
         return collisions;
     }
 }

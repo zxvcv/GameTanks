@@ -6,9 +6,4 @@ public class StoneBlock extends Block {
     public StoneBlock(Position position, int index) {
         super(position, index);
     }
-
-    @Override
-    public void display() {
-
-    }
 }

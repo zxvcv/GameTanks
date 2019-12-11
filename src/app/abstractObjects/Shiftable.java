@@ -11,7 +11,7 @@ public abstract class Shiftable extends Indexable implements Movable, Serializab
 
     public Shiftable(Position position, int index){
         super(index);
-        this.position = new Position(position.getX(), position.getY());
+        this.position = new Position(position);
     }
 
     public Position getPosition(){

@@ -10,7 +10,7 @@ public abstract class Transformable extends Shiftable implements Rotatable, Seri
 
     public Transformable(Rotation rotation, Position position, int index){
         super(position, index);
-        this.rotation = new Rotation(rotation.getRotation());
+        this.rotation = new Rotation(rotation);
     }
 
     public Rotation getRotation(){

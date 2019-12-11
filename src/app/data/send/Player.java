@@ -46,11 +46,6 @@ public class Player extends Indexable implements GameObject, Sendable {
     }
 
     @Override
-    public void display() {
-
-    }
-
-    @Override
     public void dataUpdate() {
 
     }

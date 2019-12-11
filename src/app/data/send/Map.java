@@ -1,13 +1,12 @@
 package app.data.send;
 
 import app.abstractObjects.Block;
-import app.abstractObjects.Drawable;
 import app.abstractObjects.Indexable;
 import app.abstractObjects.Sendable;
 
 import java.util.LinkedList;
 
-public class Map extends Indexable implements Drawable, Sendable {
+public class Map extends Indexable implements Sendable {
     public static final int MAP_SIZE = 25; //always square
     private Block[][] mapBlocks;
 
@@ -27,10 +26,5 @@ public class Map extends Indexable implements Drawable, Sendable {
         //...
 
         return (Block[])blocks.toArray();
-    }
-
-    @Override
-    public void display(){
-
     }
 }

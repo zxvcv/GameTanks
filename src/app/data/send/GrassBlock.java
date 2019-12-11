@@ -7,8 +7,4 @@ public class GrassBlock extends Block {
         super(position, index);
     }
 
-    @Override
-    public void display() {
-
-    }
 }

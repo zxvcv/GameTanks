@@ -1,6 +1,5 @@
 package app;
 
-import app.abstractObjects.Drawable;
 import app.abstractObjects.GameObject;
 import app.abstractObjects.Updateable;
 import app.data.send.*;
@@ -8,7 +7,7 @@ import app.data.send.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
-public class GameManager implements Updateable, Drawable {
+public class GameManager implements Updateable{
     private volatile boolean dataReady;
     private volatile boolean collisionReady;
     private volatile boolean afterReady;
@@ -247,10 +246,5 @@ public class GameManager implements Updateable, Drawable {
         afterQueue.addAll(tanks);
         afterQueue.addAll(bullets);
         afterReady = true;
-    }
-
-    @Override
-    public void display(){
-
     }
 }
