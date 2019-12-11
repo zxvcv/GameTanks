@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Tank extends Transformable implements GameObject, Shootable, CollisionManager, Sendable {
-    static final double TANK_SPEED = 1.0;
+    static final double TANK_SPEED = 10.0;
     static final double TANK_BASIC_HP = 100;
     private double hp;
     private Player player;
@@ -57,7 +57,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     public void dataUpdate() {
         String pressed = player.getKeysLog().getPressedKey();
 
-        int speedDivider = 10;
+        int speedDivider = 1;
 
         switch (pressed){
             case "W":
@@ -101,7 +101,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void afterUpdate() {
-
+        System.out.println("X:"+position.getX()+" Y:"+position.getY()+" R:"+rotation.getRotation());
     }
 
     @Override

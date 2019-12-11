@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Bullet extends Transformable implements GameObject, CollisionManager, Sendable {
-    static final double BULLET_SPEED = 2.0;
+    static final double BULLET_SPEED = 20.0;
     static final double BULLET_DMG = 10;
     private Tank owner;
 
@@ -32,7 +32,7 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void dataUpdate() {
-        int speedDivider = 10;
+        int speedDivider = 1;
 
         switch (this.rotation.getRotation()){
             case 0:

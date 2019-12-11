@@ -4,21 +4,16 @@ import app.abstractObjects.Sendable;
 
 public class GameMessage implements Sendable {
     protected String message;
-    protected int index;
-
-    public GameMessage(String message){
-        this.message = message;
-        index = 0;
-    }
+    protected int playerIndex;
 
     public GameMessage(String message, int playerIndex){
         this.message = message;
-        this.index = playerIndex;
+        this.playerIndex = playerIndex;
     }
 
     public GameMessage(GameMessage gameMessage){
         this.message = gameMessage.message;
-        this.index = gameMessage.index;
+        this.playerIndex = gameMessage.playerIndex;
     }
 
     public void setMessage(String message){
@@ -29,11 +24,7 @@ public class GameMessage implements Sendable {
         return message;
     }
 
-    public void setIndex(int index){
-        index = index;
-    }
-
-    public int getIndex(){
-        return index;
+    public int getPlayerIndex(){
+        return playerIndex;
     }
 }

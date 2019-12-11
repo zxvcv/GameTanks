@@ -15,10 +15,12 @@ public class Game {
     static final int SERVER_THREADS = 4;
     static final int MAX_PLAYERS = 4;
     static final int SERVER_SOCKET_NUM = 8100;
+    static final int SERVER_CYCLE_TIME = 500;
 
-    private static ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS * 3);
+    private static ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS * 3 + 1);
     private static GameManager gameManager;
     private ServerSocket serverSocket;
+    private Object timeLock = new Object();
 
     class ServerTask implements Runnable {
 
@@ -136,7 +138,7 @@ public class Game {
                 for(Bullet b : gameManager.getBullets())
                     outputStream.writeObject(b);
                 outputStream.writeObject(gameManager.getMap());
-                outputStream.writeObject(new GameMessage("DATA_END"));
+                outputStream.writeObject(new GameMessage("DATA_END", 0));
             } catch (IOException e) {
                 e.printStackTrace(); return;
             }
@@ -160,7 +162,7 @@ public class Game {
 
             //wysłanie sygnału startu gry do wszystkich klientów
             try {
-                outputStream.writeObject(new GameMessage("START"));
+                outputStream.writeObject(new GameMessage("START", 0));
             } catch (IOException e) {
                 e.printStackTrace(); return;
             }
@@ -220,6 +222,36 @@ public class Game {
                     }
                 } catch (IOException e) {
                     e.printStackTrace(); return;
+                }
+            }
+        }
+    }
+
+    class TimeManager implements Runnable {
+
+        private Object lock;
+
+        public TimeManager(Object lock){
+            this.lock = lock;
+        }
+
+        @Override
+        public void run() {
+            long start;
+            long elapsedTime;
+
+            while (true) {
+                try {
+                    start = System.nanoTime();
+                    gameManager.setTimeDelay(100);
+                    Thread.sleep(SERVER_CYCLE_TIME);
+                    synchronized (lock) {
+                       lock.notifyAll();
+                    }
+                    elapsedTime = System.nanoTime() - start;
+                    gameManager.setTimeDelay(elapsedTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -316,6 +348,9 @@ public class Game {
             e.printStackTrace();
         }
 
+        //uruchomienie wątku obslugi czasu
+        executorService.execute(new TimeManager(timeLock));
+
         while(true){
             gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).await();
             gameManager.getBarrier(GameManager.BarrierNum.PEROID_BARRIER).reset();
@@ -348,6 +383,9 @@ public class Game {
             gameManager.closeCycle();
 
             //opoznienie petli tak zeby obliczanie danych odbywalo sie nie czesciej niz co 100ms
+            synchronized (timeLock){
+                timeLock.wait();
+            }
         }
 
         //executorService.shutdown();

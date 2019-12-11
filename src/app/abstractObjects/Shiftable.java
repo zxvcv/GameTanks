@@ -10,7 +10,6 @@ public abstract class Shiftable extends Indexable implements Movable, Serializab
     protected Position position;
 
     public Shiftable(Position position){
-        super();
         this.position = position;
     }
 

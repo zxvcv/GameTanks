@@ -44,6 +44,23 @@ public class KeyLog implements Serializable {
         return playerIndex;
     }
 
+    public boolean getKey(String key){
+        switch(key){
+            case "W":
+                return values.get(0);
+            case "A":
+                return values.get(1);
+            case "S":
+                return values.get(2);
+            case "D":
+                return values.get(3);
+            case "SPACE":
+                return values.get(4);
+            default:
+                return false;
+        }
+    }
+
     public String getPressedKey(){
         if(this.countPressed != 1)
             return "";

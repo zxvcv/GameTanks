@@ -7,8 +7,8 @@ public abstract class Indexable implements Comparable<Indexable>, Serializable {
     private int index;
 
     public Indexable(){
-        index = objectsIndex;
-        ++objectsIndex;
+            index = objectsIndex;
+            ++objectsIndex;
     }
 
     public int getIndex(){

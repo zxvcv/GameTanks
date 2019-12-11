@@ -33,6 +33,8 @@ public class GameManager implements Updateable, Drawable {
     private ConcurrentLinkedQueue<Bullet> bullets;
     private ConcurrentLinkedQueue<Player> players;
 
+    private long timeDelay;
+
     public GameManager(){
         dataQueue = new ConcurrentLinkedQueue<>();
         collisionQueue = new ConcurrentLinkedQueue<>();
@@ -114,6 +116,14 @@ public class GameManager implements Updateable, Drawable {
         return null;
     }
 
+    public void setTimeDelay(long timeDelay) {
+        this.timeDelay = timeDelay;
+    }
+
+    public long getTimeDelay() {
+        return timeDelay;
+    }
+
     public CyclicBarrier getBarrier(BarrierNum barrierNum) {
         switch (barrierNum){
             case TASK_BARRIER: return barrierTaskRuntime;
@@ -188,10 +198,9 @@ public class GameManager implements Updateable, Drawable {
 
         while(!messageQueueReceived.isEmpty()){
             message = messageQueueReceived.poll();
-            player = getPlayerWithIndex(message.getIndex());
+            player = getPlayerWithIndex(message.getPlayerIndex());
             if(player == null)
                 continue;
-
             messageSplit = message.getMessage().split(" ");
             splitLength = messageSplit.length;
 
@@ -205,12 +214,11 @@ public class GameManager implements Updateable, Drawable {
     }
 
     public void prepareOutputData(){
-        GameMessageData gmd;
         messageQueueToSend.clear();
         for(Tank t : tanks)
-            messageQueueToSend.add(new GameMessageData(t));
+            messageQueueToSend.add(new GameMessageData(t, t.getPlayer().getIndex()));
         for(Bullet b : bullets)
-            messageQueueToSend.add(new GameMessageData(b));
+            messageQueueToSend.add(new GameMessageData(b, b.getOwner().getPlayer().getIndex()));
     }
 
     @Override
