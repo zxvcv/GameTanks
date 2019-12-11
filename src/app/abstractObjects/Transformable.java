@@ -8,9 +8,9 @@ import java.io.Serializable;
 public abstract class Transformable extends Shiftable implements Rotatable, Serializable {
     protected Rotation rotation;
 
-    public Transformable(Rotation rotation, Position position){
-        super(position);
-        this.rotation = rotation;
+    public Transformable(Rotation rotation, Position position, int index){
+        super(position, index);
+        this.rotation = new Rotation(rotation.getRotation());
     }
 
     public Rotation getRotation(){

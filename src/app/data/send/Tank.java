@@ -13,18 +13,22 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     private double hp;
     private Player player;
     private Position previousPosition;
+    private boolean shootBlock;
 
     public Tank(Tank tank){
-        super(tank.rotation, tank.position);
+        super(tank.rotation, tank.position, tank.getIndex());
         this.hp = tank.hp;
         this.player = tank.player;
         this.previousPosition = tank.previousPosition;
+        this.shootBlock = false;
+        setIndex(tank.getIndex());
     }
 
-    public Tank(Position position, Rotation rotation, Player player){
-        super(rotation, position);
+    public Tank(Position position, Rotation rotation, Player player, int index){
+        super(rotation, position, index);
         this.hp = TANK_BASIC_HP;
         this.player = player;
+        this.shootBlock = false;
         this.previousPosition = new Position(position);
     }
 
@@ -59,6 +63,10 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
         int speedDivider = 1;
 
+        if(shootBlock && !player.getKeysLog().getKey("SPACE")){
+            shootBlock = false;
+        }
+
         switch (pressed){
             case "W":
                 this.rotation.setRotation(90);
@@ -77,7 +85,10 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
                 this.move(TANK_SPEED/speedDivider, 0);
                 break;
             case "SPACE":
-                this.shoot();
+                if(!shootBlock){
+                    this.shoot();
+                    shootBlock = true;
+                }
                 break;
             default:
                 break;
@@ -101,12 +112,12 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void afterUpdate() {
-        System.out.println("X:"+position.getX()+" Y:"+position.getY()+" R:"+rotation.getRotation());
+
     }
 
     @Override
     public void shoot() {
-        Bullet newBullet = new Bullet(this.position, this.rotation, this);
+        Bullet newBullet = new Bullet(this.position, this.rotation, this, Game.getIndexer().getIndex());
         Game.getGameManager().getBullets().add(newBullet);
     }
 

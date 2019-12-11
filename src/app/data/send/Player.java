@@ -10,8 +10,8 @@ public class Player extends Indexable implements GameObject, Sendable {
     private int points;
     private KeyLog keysLog;
 
-    public Player(){
-        super();
+    public Player(int index){
+        super(index);
         this.tank = null;
         this.points = 0;
         this.keysLog = new KeyLog(getIndex());

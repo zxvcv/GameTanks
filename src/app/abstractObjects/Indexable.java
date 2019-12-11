@@ -3,12 +3,10 @@ package app.abstractObjects;
 import java.io.Serializable;
 
 public abstract class Indexable implements Comparable<Indexable>, Serializable {
-    private static int objectsIndex = 1;
     private int index;
 
-    public Indexable(){
-            index = objectsIndex;
-            ++objectsIndex;
+    public Indexable(int index){
+        this.index = index;
     }
 
     public int getIndex(){

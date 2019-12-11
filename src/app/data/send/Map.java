@@ -11,7 +11,8 @@ public class Map extends Indexable implements Drawable, Sendable {
     public static final int MAP_SIZE = 25; //always square
     private Block[][] mapBlocks;
 
-    public Map() {
+    public Map(int index) {
+        super(index);
         mapBlocks = new Block[MAP_SIZE][MAP_SIZE];
         //always the same map
     }

@@ -7,12 +7,18 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Bullet extends Transformable implements GameObject, CollisionManager, Sendable {
-    static final double BULLET_SPEED = 20.0;
+    static final double BULLET_SPEED = 1.0;
     static final double BULLET_DMG = 10;
     private Tank owner;
 
-    public Bullet(Position position, Rotation rotation, Tank owner){
-        super(rotation, position);
+    public Bullet(Bullet bullet){
+        super(bullet.rotation, bullet.position, bullet.getIndex());
+        this.owner = bullet.owner;
+        setIndex(bullet.getIndex());
+    }
+
+    public Bullet(Position position, Rotation rotation, Tank owner, int index){
+        super(rotation, position, index);
         this.owner = owner;
     }
 

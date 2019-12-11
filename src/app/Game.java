@@ -15,12 +15,13 @@ public class Game {
     static final int SERVER_THREADS = 4;
     static final int MAX_PLAYERS = 4;
     static final int SERVER_SOCKET_NUM = 8100;
-    static final int SERVER_CYCLE_TIME = 500;
+    static final int SERVER_CYCLE_TIME = 20;
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS * 3 + 1);
     private static GameManager gameManager;
     private ServerSocket serverSocket;
     private Object timeLock = new Object();
+    private static Indexer indexer = new Indexer();
 
     class ServerTask implements Runnable {
 
@@ -265,6 +266,10 @@ public class Game {
         return executorService;
     }
 
+    public static Indexer getIndexer() {
+        return indexer;
+    }
+
     private void runServerMode() throws BrokenBarrierException, InterruptedException {
         gameManager = new GameManager();
 
@@ -311,8 +316,8 @@ public class Game {
             }
 
             //jezeli odebrano polaczenie to stwórz nowego gracza i zainicjuj polaczenie
-            newPlayer = new Player();
-            newTank = new Tank(new Position(50f, 50f), new Rotation(0), newPlayer);
+            newPlayer = new Player(indexer.getIndex());
+            newTank = new Tank(new Position(50f, 50f), new Rotation(0), newPlayer, indexer.getIndex());
             gameManager.getPlayers().add(newPlayer);
             gameManager.getTanks().add(newTank);
             newPlayer.setTank(newTank);

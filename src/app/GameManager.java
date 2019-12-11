@@ -47,7 +47,7 @@ public class GameManager implements Updateable, Drawable {
         afterReady = false;
 
         tanks = new ConcurrentLinkedQueue<>();
-        map = new Map();
+        map = new Map(Game.getIndexer().getIndex());
         bullets = new ConcurrentLinkedQueue<>();
         players = new ConcurrentLinkedQueue<>();
         messageQueueReceived = new ConcurrentLinkedQueue<>();
@@ -217,8 +217,12 @@ public class GameManager implements Updateable, Drawable {
         messageQueueToSend.clear();
         for(Tank t : tanks)
             messageQueueToSend.add(new GameMessageData(t, t.getPlayer().getIndex()));
-        for(Bullet b : bullets)
+        System.out.println("posickow: " + bullets.size());
+        for(Bullet b : bullets){
             messageQueueToSend.add(new GameMessageData(b, b.getOwner().getPlayer().getIndex()));
+            System.out.println(b.getIndex());
+        }
+
     }
 
     @Override
