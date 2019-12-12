@@ -1,0 +1,50 @@
+CREATE DATABASE gametanksdb;
+USE gametanksdb;
+
+CREATE TABLE map
+( 
+	id_map			INT(8) PRIMARY KEY AUTO_INCREMENT,
+	name 			CHAR(255) NOT NULL, 
+	sizeX			INT(8) NOT NULL,
+	sizeY			INT(8) NOT NULL,
+	playersNum		INT(8) NOT NULL
+)DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE map AUTO_INCREMENT = 1;
+
+CREATE TABLE block
+( 
+	id_block		INT(8) PRIMARY KEY AUTO_INCREMENT,
+	id_map			INT(8) NOT NULL,
+	positionX		INT(8) NOT NULL,
+	positionY		INT(8) NOT NULL,
+	blockType		ENUM('GRASS', 'STONE') NOT NULL
+)DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; 
+
+ALTER TABLE block AUTO_INCREMENT = 1;
+
+CREATE TABLE spawn
+( 
+	id_spawn		INT(8) PRIMARY KEY AUTO_INCREMENT,
+	positionX		INT(8) NOT NULL,
+	positionY		INT(8) NOT NULL,
+	playerColor		ENUM('R', 'G', 'B', 'Y') NOT NULL,
+	id_map			INT(8) NOT NULL
+)DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; 
+
+ALTER TABLE spawn AUTO_INCREMENT = 1;
+
+ALTER TABLE block ADD FOREIGN KEY (id_map) REFERENCES map(id_map); 
+
+ALTER TABLE spawn ADD FOREIGN KEY (id_map) REFERENCES map(id_map); 
+
+
+CREATE TABLE player
+( 
+	player			INT(8) PRIMARY KEY AUTO_INCREMENT,
+	nick 			CHAR(255) NOT NULL, 
+	password		CHAR(255) NOT NULL,
+	record			INT(8) NOT NULL
+)DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; 
+
+ALTER TABLE player AUTO_INCREMENT = 1;

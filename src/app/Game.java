@@ -15,7 +15,7 @@ public class Game {
     static final int SERVER_THREADS = 4;
     static final int MAX_PLAYERS = 4;
     static final int SERVER_SOCKET_NUM = 8100;
-    static final int SERVER_CYCLE_TIME = 20;
+    static final int SERVER_CYCLE_TIME = 50;
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS * 3 + 1);
     private static GameManager gameManager;

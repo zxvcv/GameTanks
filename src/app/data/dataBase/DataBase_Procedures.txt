@@ -1,0 +1,71 @@
+DELIMITER //
+CREATE PROCEDURE create_map(
+	_name 		CHAR(255), 
+	_sizeX		INT(8),
+	_sizeY		INT(8)
+)
+BEGIN
+	INSERT INTO map(name, sizeX, sizeY, playersNum) VALUES (_name, _sizeX, _sizeY, 4);
+END //
+
+
+
+DELIMITER //
+CREATE PROCEDURE create_block(
+	_name 		CHAR(255),
+	_positionX	INT(8),
+	_positionY	INT(8),
+	_blockType	ENUM('GRASS', 'STONE')
+)
+BEGIN
+	SET @_id_map := (SELECT id_map FROM map WHERE _name = _name);
+	INSERT INTO block(id_map, positionX, positionY, blockType) VALUES (@_id_map, _positionX, _positionY, _blockType);
+END //
+
+
+
+DELIMITER //
+CREATE PROCEDURE create_spawn(
+	_name 		CHAR(255),
+	_positionX	INT(8),
+	_positionY	INT(8),
+	_playerColor	ENUM('R', 'G', 'B', 'Y')
+)
+BEGIN
+	SET @_id_map := (SELECT id_map FROM map WHERE _name = _name);
+	INSERT INTO spawn(id_map, positionX, positionY, playerColor) VALUES (@_id_map, _positionX, _positionY, _playerColor);
+END //
+
+
+
+DELIMITER //
+CREATE PROCEDURE get_mapByName(
+	_name 		CHAR(255)
+)
+BEGIN
+	SELECT * FROM map WHERE  _name = _name;
+END //
+
+
+
+DELIMITER //
+CREATE PROCEDURE get_allBlocks(
+	_name 		CHAR(255)
+)
+BEGIN
+	SELECT blockType, positionX, positionY
+		FROM block
+		WHERE  _name = _name;
+END //
+
+
+
+DELIMITER //
+CREATE PROCEDURE get_allSpawns(
+	_name 		CHAR(255)
+)
+BEGIN
+	SELECT playerColor, positionX, positionY
+		FROM spawn
+		WHERE  _name = _name;
+END //
