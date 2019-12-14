@@ -48,8 +48,10 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public synchronized void destroy() {
+        GameManager gameManager = Game.getGameManager();
         player.remTank();
-        Game.getGameManager().getTanks().remove(this);
+        gameManager.getMessageQueueToSend().add(new GameMessage("DESTROY TANK", getIndex()));
+        gameManager.getTanks().remove(this);
     }
 
     @Override
@@ -119,13 +121,13 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
         Position pos = new Position(this.position.getX(), this.position.getY());
 
         if(rotation.getRotation() == 0) //w prawo
-            pos = new Position(this.position.getX() + 40, this.position.getY() + 20);
+            pos = new Position(this.position.getX() + 25, this.position.getY());
         if(rotation.getRotation() == 90) // w dol
-            pos = new Position(this.position.getX() + 20, this.position.getY() + 40);
+            pos = new Position(this.position.getX(), this.position.getY() + 25);
         if(rotation.getRotation() == 180) //w lewo
-            pos = new Position(this.position.getX(), this.position.getY() + 20);
+            pos = new Position(this.position.getX() - 25, this.position.getY());
         if(rotation.getRotation() == 270) //do gory
-            pos = new Position(this.position.getX() + 20, this.position.getY());
+            pos = new Position(this.position.getX(), this.position.getY() - 25);
 
         Bullet newBullet = new Bullet(pos, this.rotation, this, Game.getIndexer().getIndex());
         Game.getGameManager().getBullets().add(newBullet);

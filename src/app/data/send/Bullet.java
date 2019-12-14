@@ -28,7 +28,10 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void destroy() {
-        Game.getGameManager().getBullets().remove(this);
+        GameManager gameManager = Game.getGameManager();
+        gameManager.getMessageQueueToSend().add(new GameMessage("DESTROY BULLET", getIndex()));
+        gameManager.getBullets().remove(this);
+        System.out.println("destroy bullet");
     }
 
     @Override

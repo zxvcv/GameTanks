@@ -197,7 +197,8 @@ public class Game {
                     message = (GameMessage) data;
                     gameManager.getMessageQueueReceived().add(message);
                 } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace(); return;
+                    e.printStackTrace();
+                    return;
                 }
             }
 
@@ -286,6 +287,7 @@ public class Game {
         do{
             System.out.print("set number of players [1-4]: ");
             playersNum = consoleIn.nextInt();
+            //playersNum = 1;
             if(playersNum == 0) {
                 System.out.println("[I] server shutdown");
                 return;

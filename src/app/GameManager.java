@@ -224,7 +224,7 @@ public class GameManager implements Updateable{
     }
 
     public void prepareOutputData(){
-        messageQueueToSend.clear();
+        //messageQueueToSend.clear();
         for(Tank t : tanks)
             messageQueueToSend.add(new GameMessageData(t, t.getPlayer().getIndex()));
         for(Bullet b : bullets)
