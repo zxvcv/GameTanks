@@ -1,6 +1,7 @@
 package app;
 
 import app.abstractObjects.GameObject;
+import app.data.dataBase.DataSource;
 import app.data.send.*;
 
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.Scanner;
 import java.util.concurrent.*;
 
@@ -20,6 +22,7 @@ public class Game {
     private static ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS * 3 + 1);
     private static GameManager gameManager;
     private ServerSocket serverSocket;
+    private DataSource dataSource;
     private Object timeLock = new Object();
     private static Indexer indexer = new Indexer();
 
@@ -271,7 +274,8 @@ public class Game {
     }
 
     private void runServerMode() throws BrokenBarrierException, InterruptedException {
-        gameManager = new GameManager();
+        gameManager = new GameManager("mapaTeset");
+        dataSource = new DataSource();
 
         for (int i = 0; i < SERVER_THREADS; ++i)
             executorService.execute(new ServerTask());

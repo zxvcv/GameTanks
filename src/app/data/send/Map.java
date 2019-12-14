@@ -7,17 +7,19 @@ import app.abstractObjects.Sendable;
 import java.util.LinkedList;
 
 public class Map extends Indexable implements Sendable {
-    public static final int MAP_SIZE = 25; //always square
-    private Block[][] mapBlocks;
+    protected Block[][] mapBlocks;
 
-    public Map(int index) {
+    public Map(Block[][] blocks, int index) {
         super(index);
-        mapBlocks = new Block[MAP_SIZE][MAP_SIZE];
-        //always the same map
+        this.mapBlocks = blocks;
     }
 
     public Block getBlock(int x, int y){
         return mapBlocks[x][y];
+    }
+
+    public Block[][] getBlocks(){
+        return mapBlocks;
     }
 
     Block[] getClosestBlocks(Position position){

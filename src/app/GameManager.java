@@ -1,9 +1,12 @@
 package app;
 
+import app.abstractObjects.Block;
 import app.abstractObjects.GameObject;
 import app.abstractObjects.Updateable;
+import app.data.dataBase.DataSource;
 import app.data.send.*;
 
+import java.sql.SQLException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
@@ -20,6 +23,7 @@ public class GameManager implements Updateable{
     private CyclicBarrier barrierTaskRuntime;
     private CyclicBarrier barrierPeroidRuntime;
     private CyclicBarrier barrierTransmitters; //ilosc zalezy od ilosci graczy
+    private DataSource dataSource;
 
     public enum BarrierNum{
         TASK_BARRIER,
@@ -34,7 +38,7 @@ public class GameManager implements Updateable{
 
     private long timeDelay;
 
-    public GameManager(){
+    public GameManager(String mapName){
         dataQueue = new ConcurrentLinkedQueue<>();
         collisionQueue = new ConcurrentLinkedQueue<>();
         afterQueue = new ConcurrentLinkedQueue<>();
@@ -46,7 +50,14 @@ public class GameManager implements Updateable{
         afterReady = false;
 
         tanks = new ConcurrentLinkedQueue<>();
-        map = new Map(Game.getIndexer().getIndex());
+        dataSource = new DataSource();
+        try {
+            map = new Map(dataSource.getMapDB(mapName), Game.getIndexer().getIndex());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            e.getMessage();
+            return;
+        }
         bullets = new ConcurrentLinkedQueue<>();
         players = new ConcurrentLinkedQueue<>();
         messageQueueReceived = new ConcurrentLinkedQueue<>();
