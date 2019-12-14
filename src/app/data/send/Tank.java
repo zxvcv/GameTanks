@@ -8,7 +8,8 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Tank extends Transformable implements GameObject, Shootable, CollisionManager, Sendable {
-    static final double TANK_SPEED = 5.0;
+    public static final int TANK_SIZE = 40;
+    static final double TANK_SPEED = 10.0;
     static final double TANK_BASIC_HP = 100;
     private double hp;
     private Player player;
@@ -96,17 +97,16 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     @Override
     public void collisionUpdate() {
-        //System.out.println("collisionUpdate - serverApp.data.send.Tank \t\tT: " + threadNum + " \tI: " + this.getIndex());
-        /*
-        serverApp.GameManager gm = serverApp.Game.getGameManager();
-        LinkedList<serverApp.abstractObjects.Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
+        GameManager gm = Game.getGameManager();
+        LinkedList<Shiftable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
         if(collisions.isEmpty())
             return;
-        for(serverApp.abstractObjects.Drawable o : collisions){
-            if(o instanceof serverApp.abstractObjects.Block || o instanceof serverApp.data.send.Tank)
+
+        for(Shiftable o : collisions){
+            if(o instanceof StoneBlock || o instanceof Tank) {
                 position.setPosition(previousPosition.getX(), previousPosition.getY()); //cofniecie ruchu (nie mozna sie ruszyc w te strone)
+            }
         }
-         */
     }
 
     @Override
@@ -117,6 +117,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     @Override
     public void shoot() {
         Position pos = new Position(this.position.getX(), this.position.getY());
+
         if(rotation.getRotation() == 0) //w prawo
             pos = new Position(this.position.getX() + 40, this.position.getY() + 20);
         if(rotation.getRotation() == 90) // w dol
@@ -137,24 +138,41 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     }
 
     @Override
-    public LinkedList<GameObject> checkCollisions(Map map, ConcurrentLinkedQueue<Tank> tanks, ConcurrentLinkedQueue<Bullet> bullets) {
+    public LinkedList<Shiftable> checkCollisions(Map map, ConcurrentLinkedQueue<Tank> tanks, ConcurrentLinkedQueue<Bullet> bullets) {
         GameManager gm = Game.getGameManager();
-        Block[] blocks = gm.getMap().getClosestBlocks(this.position);
-        LinkedList<GameObject> collisions = new LinkedList<>();
-        /*
-        for(Bullet b : bullets){
-            if(this.distanceToObj(b) <= 0)
-                collisions.add(b);
-        }
+        LinkedList<Block> blocks = gm.getMap().getClosestBlocks(this.position);
+        LinkedList<Shiftable> collisions = new LinkedList<>();
+
         for(Block b : blocks){
             if(this.distanceToObj(b) <= 0)
                 collisions.add(b);
         }
+
         for(Tank t : tanks){
-            if(this.distanceToObj(t) <= 0)
+            if(this.distanceToObj(t) <= 0 && t != this)
                 collisions.add(t);
         }
-        */
+
         return collisions;
+    }
+
+    @Override
+    public int distanceToObj(Shiftable point2) {
+        Position p1 = this.position;
+        Position p2 = point2.getPosition();
+        double distanceBounds = 0.0;
+
+        if(point2 instanceof Bullet)
+            return 1; //zawsze sa oddlone (nie ma kolizji midzy pociskami)
+
+        if(point2 instanceof Tank)
+            distanceBounds = Tank.TANK_SIZE;
+        else if(point2 instanceof Block)
+            distanceBounds = TANK_SIZE / 2.0 + Block.BLOCK_SIZE / 2.0 - 10;
+
+        if(Math.abs(p1.getX() - p2.getX()) <= distanceBounds && Math.abs(p1.getY() - p2.getY()) <= distanceBounds)
+            return -1;
+        else
+            return 1;
     }
 }

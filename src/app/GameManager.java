@@ -227,12 +227,8 @@ public class GameManager implements Updateable{
         messageQueueToSend.clear();
         for(Tank t : tanks)
             messageQueueToSend.add(new GameMessageData(t, t.getPlayer().getIndex()));
-        System.out.println("posickow: " + bullets.size());
-        for(Bullet b : bullets){
+        for(Bullet b : bullets)
             messageQueueToSend.add(new GameMessageData(b, b.getOwner().getPlayer().getIndex()));
-            System.out.println(b.getIndex());
-        }
-
     }
 
     @Override

@@ -1,6 +1,7 @@
 package app.data.send;
 
 import app.Game;
+import app.GameManager;
 import app.abstractObjects.*;
 
 import java.util.LinkedList;
@@ -53,20 +54,19 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
 
     @Override
     public void collisionUpdate() {
-        //System.out.println("collisionUpdate - serverApp.data.send.Bullet \tT: " + threadNum + " \tI: " + this.getIndex());
-        /*
-        serverApp.GameManager gm = serverApp.Game.getGameManager();
-        LinkedList<serverApp.abstractObjects.Drawable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
+        GameManager gm = Game.getGameManager();
+        LinkedList<Shiftable> collisions = checkCollisions(gm.getMap(), gm.getTanks(), gm.getBullets());
         if(collisions.isEmpty())
             return;
-        for(serverApp.abstractObjects.Drawable o : collisions){
-            if(o instanceof serverApp.data.send.Tank){
+        for(Shiftable o : collisions){
+            if(o instanceof Tank){
                 owner.getPlayer().addPoints(20);
-                ((serverApp.data.send.Tank) o).hit(BULLET_DMG);
+                ((Tank) o).hit(BULLET_DMG);
+            }
+            if(o instanceof StoneBlock) {
+                this.destroy();
             }
         }
-        this.destroy();
-         */
     }
 
     @Override
@@ -75,25 +75,40 @@ public class Bullet extends Transformable implements GameObject, CollisionManage
     }
 
     @Override
-    public LinkedList<GameObject> checkCollisions(Map map, ConcurrentLinkedQueue<Tank> tanks, ConcurrentLinkedQueue<Bullet> bullets) {
-        Block[] blocks = map.getClosestBlocks(this.position);
-        LinkedList<GameObject> collisions = new LinkedList<>();
-        /*
+    public LinkedList<Shiftable> checkCollisions(Map map, ConcurrentLinkedQueue<Tank> tanks, ConcurrentLinkedQueue<Bullet> bullets) {
+        LinkedList<Block> blocks = map.getClosestBlocks(this.position);
+        LinkedList<Shiftable> collisions = new LinkedList<>();
+
         for(Block b : blocks){
             if(this.distanceToObj(b) <= 0)
-                collisions.add(b);
+                if(b instanceof StoneBlock)
+                    collisions.add(b);
         }
         for(Tank t : tanks){
             if(this.distanceToObj(t) <= 0)
                 collisions.add(t);
         }
 
-         */
         return collisions;
     }
 
     @Override
-    public double distanceToBound(Shiftable p2){
-        return 0;
+    public int distanceToObj(Shiftable point2) {
+        Position p1 = this.position;
+        Position p2 = point2.getPosition();
+        double distanceBounds = 0.0;
+
+        if(point2 instanceof Bullet)
+            return 1; //zawsze sa oddlone (nie ma kolizji midzy pociskami)
+
+        if(point2 instanceof Tank)
+            distanceBounds = Tank.TANK_SIZE / 2.0;
+        else if(point2 instanceof Block)
+            distanceBounds = Block.BLOCK_SIZE / 2.0;
+
+        if(Math.abs(p1.getX() - p2.getX()) <= distanceBounds && Math.abs(p1.getY() - p2.getY()) <= distanceBounds)
+            return -1;
+        else
+            return 1;
     }
 }

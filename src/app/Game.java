@@ -321,7 +321,7 @@ public class Game {
 
             //jezeli odebrano polaczenie to stwórz nowego gracza i zainicjuj polaczenie
             newPlayer = new Player(indexer.getIndex());
-            newTank = new Tank(new Position(50f, 50f), new Rotation(0), newPlayer, indexer.getIndex());
+            newTank = new Tank(new Position(525f, 525f), new Rotation(0), newPlayer, indexer.getIndex());
             gameManager.getPlayers().add(newPlayer);
             gameManager.getTanks().add(newTank);
             newPlayer.setTank(newTank);

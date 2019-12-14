@@ -50,9 +50,9 @@ public class DataSource {
             x = resultSet.getInt("positionX");
             y = resultSet.getInt("positionY");
             if(type.equals("STONE"))
-                blocks[x][y] = new StoneBlock(new Position(x * 50, y * 50), indexer.getIndex());
+                blocks[x][y] = new StoneBlock(new Position(x * 50 + 25, y * 50 + 25), indexer.getIndex());
             else if(type.equals("GRASS"))
-                blocks[x][y] = new GrassBlock(new Position(x * 50,y * 50), indexer.getIndex());
+                blocks[x][y] = new GrassBlock(new Position(x * 50 + 25,y * 50 + 25), indexer.getIndex());
             else
                 throw new SQLException("wrong blockType");
             counter++;
