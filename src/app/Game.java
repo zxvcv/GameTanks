@@ -18,13 +18,14 @@ import java.util.concurrent.*;
 public class Game {
     static final int SERVER_THREADS = 4;
     static final int MAX_PLAYERS = 4;
-    static final int SERVER_SOCKET_NUM = 8100;
+    static final int[] SERVER_SOCKET_NUM = {8100, 8101, 8102, 8103};
+    static int socetCoutner = 0;
     static final int SERVER_CYCLE_TIME = 50;
     private static final String mapName= "mapaTeset";
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS * 3 + 1);
     private static GameManager gameManager;
-    private ServerSocket serverSocket;
+    private ServerSocket[] serverSocket = new ServerSocket[4];
     private DataSource dataSource;
     private Object timeLock = new Object();
     private static Indexer indexer = new Indexer();
@@ -315,20 +316,22 @@ public class Game {
         //tworzenie bariery transmitera danych dla odpowiedniej liczby graczy
         gameManager.setBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER, new CyclicBarrier(playersNum+1));
 
-        //uruchamianie socet'a
-        try {
-            serverSocket = new ServerSocket(SERVER_SOCKET_NUM);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
+
         //dołączanie graczy do gry
         Socket incoming;
         Player newPlayer;
         Tank newTank;
         for(int i = playersNum; i > 0; --i){
+            //uruchamianie socet'a
             try {
-                incoming = serverSocket.accept();
+                serverSocket[socetCoutner] = new ServerSocket(SERVER_SOCKET_NUM[socetCoutner]);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+
+            try {
+                incoming = serverSocket[socetCoutner].accept();
             } catch (IOException e) {
                 e.printStackTrace();
                 continue;
@@ -350,6 +353,7 @@ public class Game {
                 e.printStackTrace();
                 return;
             }
+            socetCoutner++;
         }
 
         //bariera transmiterów (T1) - oczekiwanie na dolaczenie wszystkich graczy

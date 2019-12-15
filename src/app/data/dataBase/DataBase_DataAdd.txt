@@ -1,4 +1,4 @@
-CALL create_map('mapaTeset', 20, 20);
+CALL create_map('mapaTest', 20, 20);
 
 CALL create_block('mapaTest', 0, 0, 'STONE');
 CALL create_block('mapaTest', 0, 1, 'STONE');
@@ -419,3 +419,8 @@ CALL create_block('mapaTest', 19, 16, 'STONE');
 CALL create_block('mapaTest', 19, 17, 'STONE');
 CALL create_block('mapaTest', 19, 18, 'STONE');
 CALL create_block('mapaTest', 19, 19, 'STONE');
+
+CALL create_spawn('mapaTest', 1, 15, 'R');
+CALL create_spawn('mapaTest', 4, 1, 'G');
+CALL create_spawn('mapaTest', 18, 4, 'B');
+CALL create_spawn('mapaTest', 15, 18, 'Y');
