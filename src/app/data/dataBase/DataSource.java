@@ -2,6 +2,7 @@ package app.data.dataBase;
 
 import app.Game;
 import app.abstractObjects.Block;
+import app.data.dataBase.dbData.Spawn;
 import app.data.send.*;
 
 import java.sql.Connection;
@@ -62,5 +63,42 @@ public class DataSource {
             throw new SQLException("wrong num of data");
 
         return blocks;
+    }
+
+    public Spawn[] getSpawnsDB(String mapName) throws SQLException{
+        PreparedStatement exeStatement;
+        ResultSet resultSet;
+        Spawn[] spawns;
+
+        exeStatement = statements.get("get_mapByName");
+        exeStatement.setString(1, mapName);
+        resultSet = exeStatement.executeQuery();
+
+        resultSet.last();
+        if(resultSet.getRow() != 1)
+            throw new SQLException("not one result");
+        resultSet.first();
+
+        exeStatement = statements.get("get_allSpawns");
+        exeStatement.setString(1, mapName);
+        resultSet = exeStatement.executeQuery();
+
+        resultSet.last();
+        int length = resultSet.getRow();
+        if(length <= 0)
+            throw new SQLException("no data");
+        resultSet.beforeFirst();
+
+        spawns = new Spawn[length];
+        String color;
+        int x,y,i=0;
+        while(resultSet.next()){
+            color = resultSet.getString("playerColor");
+            x = resultSet.getInt("positionX");
+            y = resultSet.getInt("positionY");
+            spawns[i++] = new Spawn(x, y, color);
+        }
+
+        return spawns;
     }
 }

@@ -1,7 +1,9 @@
 package app;
 
+import app.abstractObjects.Block;
 import app.abstractObjects.GameObject;
 import app.data.dataBase.DataSource;
+import app.data.dataBase.dbData.Spawn;
 import app.data.send.*;
 
 import java.io.IOException;
@@ -18,6 +20,7 @@ public class Game {
     static final int MAX_PLAYERS = 4;
     static final int SERVER_SOCKET_NUM = 8100;
     static final int SERVER_CYCLE_TIME = 50;
+    private static final String mapName= "mapaTeset";
 
     private static ExecutorService executorService = Executors.newFixedThreadPool(SERVER_THREADS + MAX_PLAYERS * 3 + 1);
     private static GameManager gameManager;
@@ -275,7 +278,7 @@ public class Game {
     }
 
     private void runServerMode() throws BrokenBarrierException, InterruptedException {
-        gameManager = new GameManager("mapaTeset");
+        gameManager = new GameManager(mapName);
         dataSource = new DataSource();
 
         for (int i = 0; i < SERVER_THREADS; ++i)
@@ -298,6 +301,17 @@ public class Game {
             }
         }while(true);
 
+        //pobieranie spawnów
+        Spawn[] spawns;
+        int spawnsCounter = 0;
+        try {
+            spawns = dataSource.getSpawnsDB(mapName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return;
+        }
+        System.out.println(spawns.length);
+
         //tworzenie bariery transmitera danych dla odpowiedniej liczby graczy
         gameManager.setBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER, new CyclicBarrier(playersNum+1));
 
@@ -308,7 +322,6 @@ public class Game {
             e.printStackTrace();
             return;
         }
-
         //dołączanie graczy do gry
         Socket incoming;
         Player newPlayer;
@@ -323,7 +336,11 @@ public class Game {
 
             //jezeli odebrano polaczenie to stwórz nowego gracza i zainicjuj polaczenie
             newPlayer = new Player(indexer.getIndex());
-            newTank = new Tank(new Position(525f, 525f), new Rotation(0), newPlayer, indexer.getIndex());
+            System.out.println(spawns[spawnsCounter]);
+            newTank = new Tank(new Position(spawns[spawnsCounter].getPosition().getX() * Block.BLOCK_SIZE + 25, spawns[spawnsCounter].getPosition().getY() * Block.BLOCK_SIZE + 25),
+                    new Rotation(0), newPlayer,
+                    indexer.getIndex());
+            spawnsCounter++;
             gameManager.getPlayers().add(newPlayer);
             gameManager.getTanks().add(newTank);
             newPlayer.setTank(newTank);
