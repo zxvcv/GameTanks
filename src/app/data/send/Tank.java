@@ -50,7 +50,8 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     public synchronized void destroy() {
         GameManager gameManager = Game.getGameManager();
         player.remTank();
-        gameManager.getMessageQueueToSend().add(new GameMessage("DESTROY TANK", getIndex()));
+        for(int i=0; i<Game.getPlayersNum(); ++i)
+            gameManager.getMessageQueueToSend(i).add(new GameMessage("DESTROY TANK", getIndex()));
         gameManager.getTanks().remove(this);
     }
 

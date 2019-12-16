@@ -29,6 +29,7 @@ public class Game {
     private DataSource dataSource;
     private Object timeLock = new Object();
     private static Indexer indexer = new Indexer();
+    private static int playersNum;
 
     class ServerTask implements Runnable {
 
@@ -102,14 +103,16 @@ public class Game {
     }
 
     class ServerConnector implements Runnable {
+        private int playerNum;
         private Player player;
         private Socket socket;
         private ObjectOutputStream outputStream;
         private ObjectInputStream inputStream;
 
-        public ServerConnector(Player player, Socket socket) throws IOException {
+        public ServerConnector(Player player, Socket socket, int playerNum) throws IOException {
             this.player = player;
             this.socket = socket;
+            this.playerNum = playerNum;
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             inputStream = new ObjectInputStream(socket.getInputStream());
         }
@@ -177,7 +180,7 @@ public class Game {
 
             ExecutorService executorService = Game.getExecutorService();
             executorService.execute(new ServerDataTransmitterIn(player, inputStream));
-            executorService.execute(new ServerDataTransmitterOut(player, outputStream));
+            executorService.execute(new ServerDataTransmitterOut(player, outputStream, playerNum));
         }
     }
 
@@ -210,12 +213,14 @@ public class Game {
     }
 
     class ServerDataTransmitterOut implements Runnable {
+        private int playerNum;
         private Player player;
         private ObjectOutputStream outputStream;
 
-        public ServerDataTransmitterOut(Player player, ObjectOutputStream outputStream) {
+        public ServerDataTransmitterOut(Player player, ObjectOutputStream outputStream, int playerNum) {
             this.player = player;
             this.outputStream = outputStream;
+            this.playerNum = playerNum;
         }
 
         @Override
@@ -225,8 +230,8 @@ public class Game {
 
             while(true){
                 try {
-                    if(!gameManager.getMessageQueueToSend().isEmpty() && gameManager.isSendPermit()){
-                        message = gameManager.getMessageQueueToSend().poll();
+                    if(!gameManager.getMessageQueueToSend(playerNum).isEmpty() && gameManager.isSendPermit()){
+                        message = gameManager.getMessageQueueToSend(playerNum).poll();
                         outputStream.writeObject(message);
                     }
                 } catch (IOException e) {
@@ -278,15 +283,12 @@ public class Game {
         return indexer;
     }
 
+    public static int getPlayersNum() {
+        return playersNum;
+    }
+
     private void runServerMode() throws BrokenBarrierException, InterruptedException {
-        gameManager = new GameManager(mapName);
-        dataSource = new DataSource();
-
-        for (int i = 0; i < SERVER_THREADS; ++i)
-            executorService.execute(new ServerTask());
-
         //ustawianie ilosci graczy
-        int playersNum;
         Scanner consoleIn = new Scanner(System.in);
         do{
             System.out.print("set number of players [1-4]: ");
@@ -302,6 +304,9 @@ public class Game {
             }
         }while(true);
 
+        gameManager = new GameManager(mapName);
+        dataSource = new DataSource();
+
         //pobieranie spawnów
         Spawn[] spawns;
         int spawnsCounter = 0;
@@ -316,12 +321,11 @@ public class Game {
         //tworzenie bariery transmitera danych dla odpowiedniej liczby graczy
         gameManager.setBarrier(GameManager.BarrierNum.TRANSMITTER_BARRIER, new CyclicBarrier(playersNum+1));
 
-
         //dołączanie graczy do gry
         Socket incoming;
         Player newPlayer;
         Tank newTank;
-        for(int i = playersNum; i > 0; --i){
+        for(int playerNum = 0; playerNum < playersNum; ++playerNum){
             //uruchamianie socet'a
             try {
                 serverSocket[socetCoutner] = new ServerSocket(SERVER_SOCKET_NUM[socetCoutner]);
@@ -348,13 +352,17 @@ public class Game {
             gameManager.getTanks().add(newTank);
             newPlayer.setTank(newTank);
             try {
-                executorService.execute(new ServerConnector(newPlayer, incoming));
+                executorService.execute(new ServerConnector(newPlayer, incoming, playerNum));
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
             }
             socetCoutner++;
         }
+
+        //właczanie watkow obsługujących obliczenia gry
+        for (int i = 0; i < SERVER_THREADS; ++i)
+            executorService.execute(new ServerTask());
 
         //bariera transmiterów (T1) - oczekiwanie na dolaczenie wszystkich graczy
         try {

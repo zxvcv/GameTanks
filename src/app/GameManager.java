@@ -7,6 +7,7 @@ import app.data.dataBase.DataSource;
 import app.data.send.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
@@ -18,7 +19,7 @@ public class GameManager implements Updateable{
     private ConcurrentLinkedQueue<GameObject> collisionQueue;
     private ConcurrentLinkedQueue<GameObject> afterQueue;
     private ConcurrentLinkedQueue<GameMessage> messageQueueReceived;
-    private ConcurrentLinkedQueue<GameMessage> messageQueueToSend;
+    private ArrayList<ConcurrentLinkedQueue<GameMessage>> messageQueueToSend;
     private boolean sendPermit;
     private CyclicBarrier barrierTaskRuntime;
     private CyclicBarrier barrierPeroidRuntime;
@@ -60,8 +61,10 @@ public class GameManager implements Updateable{
         }
         bullets = new ConcurrentLinkedQueue<>();
         players = new ConcurrentLinkedQueue<>();
+        messageQueueToSend = new ArrayList<>(Game.getPlayersNum());
+        for(int i = 0; i < Game.getPlayersNum(); ++i)
+            messageQueueToSend.add(i, new ConcurrentLinkedQueue<>());
         messageQueueReceived = new ConcurrentLinkedQueue<>();
-        messageQueueToSend = new ConcurrentLinkedQueue<>();
 
         sendPermit = false;
     }
@@ -110,8 +113,8 @@ public class GameManager implements Updateable{
         return afterQueue;
     }
 
-    public ConcurrentLinkedQueue<GameMessage> getMessageQueueToSend() {
-        return messageQueueToSend;
+    public ConcurrentLinkedQueue<GameMessage> getMessageQueueToSend(int player) {
+        return messageQueueToSend.get(player);
     }
 
     public ConcurrentLinkedQueue<GameMessage> getMessageQueueReceived() {
@@ -226,9 +229,12 @@ public class GameManager implements Updateable{
     public void prepareOutputData(){
         //messageQueueToSend.clear();
         for(Tank t : tanks)
-            messageQueueToSend.add(new GameMessageData(t, t.getPlayer().getIndex()));
+            for(int i = 0; i < Game.getPlayersNum(); ++i)
+                messageQueueToSend.get(i).add(new GameMessageData(t, t.getPlayer().getIndex()));
+
         for(Bullet b : bullets)
-            messageQueueToSend.add(new GameMessageData(b, b.getOwner().getPlayer().getIndex()));
+            for(int i = 0; i < Game.getPlayersNum(); ++i)
+                messageQueueToSend.get(i).add(new GameMessageData(b, b.getOwner().getPlayer().getIndex()));
     }
 
     @Override
