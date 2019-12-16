@@ -345,7 +345,7 @@ public class Game {
             newPlayer = new Player(indexer.getIndex());
             System.out.println(spawns[spawnsCounter]);
             newTank = new Tank(new Position(spawns[spawnsCounter].getPosition().getX() * Block.BLOCK_SIZE + 25, spawns[spawnsCounter].getPosition().getY() * Block.BLOCK_SIZE + 25),
-                    new Rotation(0), newPlayer,
+                    new Rotation(0), newPlayer, spawns[spawnsCounter].getColor(),
                     indexer.getIndex());
             spawnsCounter++;
             gameManager.getPlayers().add(newPlayer);

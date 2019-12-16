@@ -15,6 +15,7 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
     private Player player;
     private Position previousPosition;
     private boolean shootBlock;
+    private String color;
 
     public Tank(Tank tank){
         super(tank.rotation, tank.position, tank.getIndex());
@@ -22,14 +23,16 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
         this.player = tank.player;
         this.previousPosition = tank.previousPosition;
         this.shootBlock = false;
+        this.color = tank.color;
     }
 
-    public Tank(Position position, Rotation rotation, Player player, int index){
+    public Tank(Position position, Rotation rotation, Player player, String color, int index){
         super(rotation, position, index);
         this.hp = TANK_BASIC_HP;
         this.player = player;
         this.previousPosition = new Position(position);
         this.shootBlock = false;
+        this.color = color;
     }
 
     public double getHp(){
@@ -38,6 +41,10 @@ public class Tank extends Transformable implements GameObject, Shootable, Collis
 
     public Player getPlayer(){
         return player;
+    }
+
+    public String getColor() {
+        return color;
     }
 
     public synchronized void hit(double dmg){
